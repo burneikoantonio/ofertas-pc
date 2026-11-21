@@ -50,6 +50,7 @@ if (process.env.VAPID_PUBLIC && process.env.VAPID_PRIVATE) {
     if (m.teste) testes.add(m.canal);
   }
   gravar(path.join(PREFS, 'canais.json'), [...canais]);
+  if (process.env.TESTE_TODOS) for (const c of canais) testes.add(c); // botão "teste_todos" no GitHub
 
   const { ofertas } = JSON.parse(fs.readFileSync(path.join(__dirname, 'app/data/ofertas.json'), 'utf8'));
   const porId = new Map(ofertas.map(o => [o.id, o]));

@@ -16,6 +16,11 @@ on:
         type: boolean
         required: false
         default: false
+      teste_todos:
+        description: "Mandar notificação de teste para todos os celulares"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -62,6 +67,7 @@ jobs:
           VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
           SITE_URL: ${{ vars.SITE_URL }}
           REGISTRO: ${{ vars.REGISTRO }}
+          TESTE_TODOS: ${{ inputs.teste_todos && '1' || '' }}
         run: node alertas.js
 
       - name: Guardar canais e preferências
