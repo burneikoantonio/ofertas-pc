@@ -127,7 +127,7 @@ input[type=range]{width:100%;accent-color:var(--verde)}
 <main id="app"></main>
 <nav id="abas"></nav>
 <div class="toast" id="toast"></div>
-<script src="montar.js?v=1795287210"></script>
+<script src="montar.js?v=1795287400"></script>
 <script>
 // Ícones (desenhos simples, estilo iOS)
 const I = {
@@ -447,6 +447,7 @@ function telaPerfil() {
       ${S.push ? `<div>Notificações ligadas neste aparelho.</div>` : `<div>Receba aviso quando um item salvo baixar de preço e quando aparecer uma oferta imperdível.</div>`}
       <button class="btn cheio" style="width:100%;margin-top:12px" onclick="ativarPush()">${S.push ? 'Mandar notificação de teste' : 'Ativar notificações'}</button>
       <div class="sub" style="margin-top:10px">No iPhone, funciona com o app adicionado à Tela de Início (Compartilhar → Adicionar à Tela de Início).</div>
+      <div class="sub" style="margin-top:6px">Versão dos avisos: ${(navigator.serviceWorker?.controller?.scriptURL || "").split("v=")[1] || "antiga"}</div>
     </div>
     <h2>Seu nome</h2>
     <input class="campo" placeholder="Aparece nas suas recomendações" value="${esc(S.nome || '')}" onchange="S.nome=this.value.trim().slice(0,20);salvar();sincronizar();toast('Nome salvo')">
@@ -465,6 +466,8 @@ function telaPerfil() {
 }
 
 // ---------- notificações (Web Push) e sincronização ----------
+// versão da parte que recebe notificações: mudar o número obriga o celular a trocar pela nova
+const SW = 'sw.js?v=3';
 const VAPID = 'BL2PBNUFF265IC9A2CA_V_QDdXJU2UdgbxpK25ChM4ipst6CFg4_cRgxYG-opSrpsNJ7ZLlI8nSR1vYkX-_Hd_U';
 const REGISTRO = 'pcofertas-reg-qumgo2c46jisml';
 function canal() {
@@ -488,7 +491,7 @@ async function ativarPush() {
   }
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return toast('Adicione o app à Tela de Início primeiro');
   try {
-    const reg = await navigator.serviceWorker.register('sw.js');
+    const reg = await navigator.serviceWorker.register(SW);
     await navigator.serviceWorker.ready;
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') return toast('Notificações não permitidas');
@@ -506,13 +509,13 @@ async function ativarPush() {
   try { await carregar(); } catch (e) { document.getElementById('app').innerHTML = `<div class="tela"><h1>Ofertas</h1><div class="vazio">Não consegui carregar as ofertas. Verifique a internet.</div></div>`; return; }
   canal();
   rota();
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register(SW).then(r => r.update()).catch(() => {});
   // reenvia o cadastro de avisos a cada 6h de uso: o ntfy apaga mensagens depois de 12h e o robô pode demorar a ler
   if (S.push && Date.now() - (S.registrado || 0) > 6 * 3600e3) {
     try { await fetch('https://ntfy.sh/' + REGISTRO, { method: 'POST', body: JSON.stringify({ canal: canal(), em: Date.now() }) }); S.registrado = Date.now(); salvar(); sincronizar(); } catch (e) {}
   }
 })();
 </script>
-<script src="juntos.js?v=1795287210"></script>
+<script src="juntos.js?v=1795287400"></script>
 </body>
 </html>
