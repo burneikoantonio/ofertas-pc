@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ofertas PC">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-180.png">
+<link rel="icon" href="icone-192.png">
+<title>Ofertas PC</title>
+<style>
+:root{
+  --bg:#f2f2f7;--card:#fff;--card2:#f2f2f7;--txt:#000;--sec:#8e8e93;--sep:#c6c6c8;--verde:#34c759;--naVerde:#fff;--verdeFraco:#e3f8e8;--vermelho:#ff3b30;--foto:#fff;--barra:rgba(249,249,249,.94);
+}
+:root[data-tema="escuro"]{
+  --bg:#000;--card:#1c1c1e;--card2:#2c2c2e;--txt:#fff;--sec:#8e8e93;--sep:#38383a;--verde:#30d158;--naVerde:#000;--verdeFraco:#0f3a1c;--vermelho:#ff453a;--foto:#f2f2f7;--barra:rgba(22,22,24,.94);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-tema="claro"]){--bg:#000;--card:#1c1c1e;--card2:#2c2c2e;--txt:#fff;--sec:#8e8e93;--sep:#38383a;--verde:#30d158;--naVerde:#000;--verdeFraco:#0f3a1c;--vermelho:#ff453a;--foto:#f2f2f7;--barra:rgba(22,22,24,.94)}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;font-size:16px}
+body{padding:env(safe-area-inset-top) 0 calc(70px + env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:var(--verde);text-decoration:none}
+.tela{max-width:720px;margin:0 auto;padding:0 16px 24px}
+h1{font-size:32px;font-weight:700;margin:12px 0 10px;letter-spacing:.2px}
+h2{font-size:20px;font-weight:600;margin:22px 0 8px}
+.sub{color:var(--sec);font-size:13px}
+.busca{display:flex;align-items:center;gap:6px;background:var(--card2);border-radius:10px;padding:8px 10px;color:var(--sec)}
+:root[data-tema="claro"] .busca,:root:not([data-tema]) .busca{background:#e3e3e8}
+.busca input{flex:1;border:0;background:none;font:inherit;color:var(--txt);outline:none;min-width:0}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 13px;border-radius:18px;background:var(--card);font-size:14px;white-space:nowrap}
+.chip.on{background:var(--verde);color:var(--naVerde);font-weight:600}
+.linha{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ordem{font-size:14px;color:var(--verde);display:flex;align-items:center;gap:4px}
+select.ordem{border:0;background:none;font:inherit;font-size:14px;color:var(--verde);-webkit-appearance:none;appearance:none;text-align:right}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:10px}
+.card{background:var(--card);border-radius:16px;padding:8px;display:flex;flex-direction:column;position:relative;text-align:left}
+.foto{background:var(--foto);border-radius:12px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.foto img{width:88%;height:88%;object-fit:contain}
+.card .nome{font-size:13px;line-height:1.3;margin:7px 2px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px}
+.card .preco{font-size:16px;font-weight:600;margin:4px 2px 0}
+.card .loja{font-size:12px;color:var(--sec);margin:0 2px}
+.card .pe{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.nota{background:var(--verde);color:var(--naVerde);border-radius:10px;font-size:12px;font-weight:600;padding:3px 8px}
+.nota.media{background:var(--card2);color:var(--txt)}
+.coracao{width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--sec)}
+.coracao.on{color:var(--verde)}
+.coracao svg{width:22px;height:22px}
+.selo{position:absolute;top:12px;left:12px;background:var(--verde);color:var(--naVerde);font-size:11px;font-weight:600;border-radius:8px;padding:2px 7px}
+.selo.cinza{background:rgba(0,0,0,.55);color:#fff}
+.mais{display:block;width:100%;margin:16px 0;padding:12px;border-radius:12px;background:var(--card);color:var(--verde);font-weight:600}
+.vazio{text-align:center;color:var(--sec);padding:40px 10px}
+/* tela do produto */
+.topo{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:10px 0;margin:0 -16px;padding-left:10px;padding-right:16px}
+.voltar{color:var(--verde);font-size:17px;display:flex;align-items:center;gap:2px}
+.fotoGrande{background:var(--foto);border-radius:18px;aspect-ratio:1/1;max-height:420px;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.fotoGrande img{width:86%;height:86%;object-fit:contain}
+.titulo{font-size:19px;font-weight:600;line-height:1.3;margin:14px 0 6px}
+.precoGrande{font-size:30px;font-weight:700}
+.grupo{background:var(--card);border-radius:12px;overflow:hidden;margin-top:8px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:.5px solid var(--sep);font-size:15px;min-height:44px}
+.item:last-child{border-bottom:0}
+.item .dir{text-align:right;white-space:nowrap}
+.item.barato .dir{color:var(--verde);font-weight:600}
+.item small{color:var(--sec);font-size:12px;display:block;font-weight:400}
+.acoes{display:flex;gap:8px;margin-top:16px}
+.btn{background:var(--verde);color:var(--naVerde);border-radius:14px;padding:14px 16px;font-weight:600;font-size:16px;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.cheio{flex:1}
+.btn svg{width:22px;height:22px}
+.btn.fraco{background:var(--verdeFraco);color:var(--verde)}
+.barraNota{height:8px;border-radius:4px;background:var(--card2);overflow:hidden;margin-top:6px}
+.barraNota div{height:100%;background:var(--verde);border-radius:4px}
+.grafico{background:var(--card);border-radius:12px;padding:12px 14px}
+.grafico svg{width:100%;height:110px;display:block}
+.texto{background:var(--card);border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.45}
+.aviso{background:var(--verdeFraco);color:var(--txt);border-radius:12px;padding:10px 12px;font-size:14px;margin-top:10px}
+.aviso.ruim{background:rgba(255,59,48,.12)}
+/* abas */
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--barra);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:.5px solid var(--sep);display:flex;justify-content:space-around;padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:10}
+nav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--sec);min-width:64px}
+nav button svg{width:26px;height:26px}
+nav button.on{color:var(--verde)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(30,30,30,.92);color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;z-index:20;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%;text-align:center}
+.toast.on{opacity:1}
+.seg{display:flex;background:var(--card2);border-radius:9px;padding:2px}
+:root[data-tema="claro"] .seg,:root:not([data-tema]) .seg{background:#e3e3e8}
+.seg button{flex:1;padding:6px;border-radius:7px;font-size:14px}
+.seg button.on{background:var(--card);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+input.campo{width:100%;border:0;background:var(--card);border-radius:10px;padding:12px;font:inherit;color:var(--txt);outline:none}
+.esqueleto{background:var(--card);border-radius:16px;aspect-ratio:3/4;opacity:.6}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav id="abas"></nav>
+<div class="toast" id="toast"></div>
+<script>
+// Ícones (desenhos simples, estilo iOS)
+const I = {
+  coracao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.6 0 5.6 3.5 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>',
+  coracaoCheio: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.6 0 5.6 3.5 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>',
+  sino: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+  sinoCheio: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0" fill="none"/></svg>',
+  fogo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4 0 7-2.7 7-7 0-4-3-6.5-4-9.5-.6 2-1.6 3.3-3 4C12 6 10 4 9 2 8.5 6 5 8.5 5 14c0 4.3 3 8 7 8z"/></svg>',
+  grade: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>',
+  pessoa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+  lupa: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  voltar: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  compartilhar: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>',
+  seta: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>',
+};
+
+const brl = v => v == null ? '' : 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 });
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = s => String(s || '').normalize('NFD').replace(/\p{Mn}/gu, '').toLowerCase();
+
+// ---------- estado salvo no aparelho ----------
+const CHAVE = 'pcofertas.v1';
+let S = {};
+try { S = JSON.parse(localStorage.getItem(CHAVE)) || {}; } catch (e) {}
+S.curtidas ||= {}; S.alertas ||= {}; S.tema ||= 'auto'; S.grupo ||= 'todos'; S.cat ||= ''; S.ordem ||= 'nota';
+const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(S)); } catch (e) {} };
+function aplicarTema() {
+  if (S.tema === 'auto') document.documentElement.removeAttribute('data-tema');
+  else document.documentElement.setAttribute('data-tema', S.tema);
+}
+aplicarTema();
+
+let CFG, PERF, D = { ofertas: [], info: {} }, HIST = null, POR_ID = new Map(), GRUPOS = new Map();
+let limite = 40;
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._x); t._x = setTimeout(() => t.classList.remove('on'), 2200);
+}
+
+async function carregar() {
+  const v = '?v=' + Math.floor(Date.now() / 600000); // renova a cada 10 minutos
+  const [c, p, o] = await Promise.all([
+    fetch('categorias.json' + v).then(r => r.json()),
+    fetch('desempenho.json' + v).then(r => r.json()),
+    fetch('data/ofertas.json' + v).then(r => r.json()),
+  ]);
+  CFG = c; PERF = p; D = o;
+  CFG.cat = Object.fromEntries(CFG.categorias.map(x => [x.id, x]));
+  for (const x of D.ofertas) {
+    POR_ID.set(x.id, x);
+    if (x.grupo) { if (!GRUPOS.has(x.grupo)) GRUPOS.set(x.grupo, []); GRUPOS.get(x.grupo).push(x); }
+  }
+  for (const g of GRUPOS.values()) g.sort((a, b) => a.pix - b.pix);
+}
+async function historico() {
+  if (!HIST) HIST = await fetch('data/historico.json?v=' + Math.floor(Date.now() / 600000)).then(r => r.json()).catch(() => ({}));
+  return HIST;
+}
+
+// ---------- navegação ----------
+let ABA = 'ofertas';
+const PILHA = [];
+function abas() {
+  const b = (id, ic, nome) => `<button class="${ABA === id ? 'on' : ''}" onclick="irAba('${id}')">${ic}<span>${nome}</span></button>`;
+  document.getElementById('abas').innerHTML = b('ofertas', I.fogo, 'Ofertas') + b('categorias', I.grade, 'Categorias') + b('salvos', I.coracao, 'Salvos') + b('perfil', I.pessoa, 'Perfil');
+}
+function irAba(id) {
+  ABA = id; PILHA.length = 0;
+  const alvo = id === 'ofertas' ? '' : '#' + id;
+  if (location.hash !== alvo) history.pushState(null, '', alvo || location.pathname + location.search);
+  desenhar(); scrollTo(0, 0);
+}
+// PILHA guarda de onde viemos (endereço + posição da rolagem) para o Voltar devolver ao mesmo lugar
+function abrir(id) { PILHA.push({ hash: location.hash, y: scrollY }); location.hash = 'produto=' + encodeURIComponent(id); }
+function voltar() {
+  if (PILHA.length) history.back();
+  else location.hash = ABA === 'ofertas' ? '' : ABA;
+}
+window.addEventListener('hashchange', rota);
+function rota() {
+  const topo = PILHA[PILHA.length - 1];
+  const volta = topo && topo.hash === location.hash;
+  if (volta) PILHA.pop();
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith('produto=')) telaProduto(h.slice(8), volta);
+  else {
+    if (['categorias', 'salvos', 'perfil'].includes(h)) ABA = h;
+    else if (!h) ABA = 'ofertas';
+    desenhar();
+  }
+  if (volta) requestAnimationFrame(() => scrollTo(0, topo.y));
+}
+navigator.serviceWorker?.addEventListener('message', e => { if (e.data?.abrir) location.href = e.data.abrir; });
+
+function desenhar() {
+  abas();
+  if (ABA === 'categorias') return telaCategorias();
+  if (ABA === 'salvos') return telaSalvos();
+  if (ABA === 'perfil') return telaPerfil();
+  telaOfertas();
+}
+
+// ---------- ofertas (feed) ----------
+function lista() {
+  const q = norm(S.busca).split(/\s+/).filter(Boolean);
+  const ocultas = new Set(S.ocultas || []);
+  let l = D.ofertas.filter(o => !ocultas.has(o.id));
+  if (S.cat) l = l.filter(o => o.cat === S.cat);
+  else if (S.grupo !== 'todos') l = l.filter(o => CFG.cat[o.cat]?.grupo === S.grupo);
+  if (S.loja) l = l.filter(o => o.loja === S.loja);
+  if (q.length) l = l.filter(o => { const t = norm(o.t + ' ' + o.loja + ' ' + (o.chip || '')); return q.every(w => t.includes(w)); });
+  // um cartão por produto: fica a oferta mais barata entre as lojas
+  const vistos = new Set();
+  l = l.filter(o => { if (!o.grupo) return true; if (vistos.has(o.grupo)) return false; vistos.add(o.grupo); return true; })
+       .map(o => o.grupo ? GRUPOS.get(o.grupo)[0] : o);
+  const ord = {
+    nota: (a, b) => b.nota - a.nota,
+    menor: (a, b) => a.pix - b.pix,
+    maior: (a, b) => b.pix - a.pix,
+    desconto: (a, b) => desconto(b) - desconto(a),
+    custo: (a, b) => (b.np?.[1] || 0) - (a.np?.[1] || 0) || b.nota - a.nota,
+  }[S.ordem];
+  return l.sort(ord);
+}
+const desconto = o => o.ref ? (o.ref - o.pix) / o.ref : o.de ? (o.de - o.pix) / o.de : 0;
+const lojasDe = o => o.grupo ? [...new Set(GRUPOS.get(o.grupo).map(x => x.loja))] : [o.loja];
+
+function cartao(o) {
+  const n = lojasDe(o).length + (o.nlojas > 1 ? o.nlojas - 1 : 0);
+  const off = desconto(o);
+  const curtido = !!S.curtidas[o.id] || (o.grupo && GRUPOS.get(o.grupo).some(x => S.curtidas[x.id]));
+  return `<div class="card" onclick="abrir('${esc(o.id)}')">
+    <div class="foto">${o.img ? `<img loading="lazy" src="${esc(o.img)}" alt="" onerror="this.remove()">` : ''}</div>
+    ${off >= 0.1 ? `<span class="selo">-${Math.round(off * 100)}%</span>` : ''}
+    <div class="nome">${esc(o.t)}</div>
+    <div class="preco">${brl(o.pix)}</div>
+    <div class="loja">${esc(o.loja)}${n > 1 ? ` · ${n} lojas` : ''}</div>
+    <div class="pe"><span class="nota ${o.nota < 60 ? 'media' : ''}">Nota ${o.nota}</span>
+      <button class="coracao ${curtido ? 'on' : ''}" aria-label="Curtir" onclick="event.stopPropagation();curtir('${esc(o.id)}',this)">${curtido ? I.coracaoCheio : I.coracao}</button></div>
+  </div>`;
+}
+
+function telaOfertas() {
+  const l = lista();
+  const grupos = [['todos', 'Tudo'], ...CFG.grupos.map(g => [g.id, g.nome])];
+  const cats = S.grupo === 'todos' ? [] : CFG.categorias.filter(c => c.grupo === S.grupo);
+  const lojas = [...new Set(D.ofertas.map(o => o.loja))].sort();
+  const quando = D.info.atualizado ? new Date(D.info.atualizado) : null;
+  document.getElementById('app').innerHTML = `<div class="tela">
+    <h1>Ofertas</h1>
+    <label class="busca">${I.lupa}<input type="search" placeholder="Buscar peça, jogo, marca" value="${esc(S.busca || '')}" oninput="S.busca=this.value;limite=40;atualizarLista()"></label>
+    <div class="chips">${grupos.map(([id, nome]) => `<button class="chip ${S.grupo === id && !S.cat ? 'on' : ''}" onclick="S.grupo='${id}';S.cat='';limite=40;salvar();telaOfertas()">${nome}</button>`).join('')}</div>
+    ${cats.length ? `<div class="chips" style="padding-top:4px">${cats.map(c => `<button class="chip ${S.cat === c.id ? 'on' : ''}" onclick="S.cat=S.cat==='${c.id}'?'':'${c.id}';limite=40;salvar();telaOfertas()">${c.nome}</button>`).join('')}</div>` : ''}
+    <div class="linha" style="margin-top:8px">
+      <span class="sub" id="conta">${l.length} ofertas${quando ? ' · ' + quando.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''}</span>
+      <span style="display:flex;gap:14px">
+        <select class="ordem" onchange="S.loja=this.value;limite=40;salvar();atualizarLista()"><option value="">Todas as lojas</option>${lojas.map(x => `<option ${S.loja === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select>
+        <select class="ordem" onchange="S.ordem=this.value;salvar();atualizarLista()">
+          ${[['nota', 'Maior nota'], ['menor', 'Menor preço'], ['maior', 'Maior preço'], ['desconto', 'Maior queda'], ['custo', 'Custo-benefício']].map(([v, n]) => `<option value="${v}" ${S.ordem === v ? 'selected' : ''}>${n}</option>`).join('')}
+        </select></span>
+    </div>
+    <div id="lista"></div>
+  </div>`;
+  atualizarLista(l);
+}
+function atualizarLista(l) {
+  l ||= lista();
+  const c = document.getElementById('conta');
+  if (c) c.textContent = c.textContent.replace(/^\d+/, l.length);
+  document.getElementById('lista').innerHTML = l.length
+    ? `<div class="grade">${l.slice(0, limite).map(cartao).join('')}</div>${l.length > limite ? `<button class="mais" onclick="limite+=40;atualizarLista()">Mostrar mais</button>` : ''}`
+    : `<div class="vazio">Nenhuma oferta encontrada.</div>`;
+}
+
+// ---------- curtir e avisar ----------
+function curtir(id, el) {
+  const o = POR_ID.get(id);
+  if (S.curtidas[id]) { delete S.curtidas[id]; toast('Removido dos Salvos'); }
+  else { S.curtidas[id] = { t: o.t, img: o.img, pix: o.pix, loja: o.loja, cat: o.cat, em: Date.now() }; toast('Salvo. Você recebe aviso se o preço cair.'); }
+  salvar(); sincronizar();
+  if (el) { const on = !!S.curtidas[id]; el.classList.toggle('on', on); el.innerHTML = on ? I.coracaoCheio : I.coracao; }
+}
+function avisar(id) {
+  const o = POR_ID.get(id);
+  if (S.alertas[id]) { delete S.alertas[id]; toast('Aviso desligado'); }
+  else {
+    S.alertas[id] = { t: o.t, img: o.img, pix: o.pix, base: o.pix, em: Date.now() };
+    toast(S.push ? 'Aviso ligado: quando cair, você é notificado' : 'Aviso ligado. Ative as notificações no Perfil.');
+  }
+  salvar(); sincronizar(); telaProduto(id, true);
+}
+
+// ---------- tela do produto ----------
+async function telaProduto(id, manterScroll) {
+  const o = POR_ID.get(id);
+  abas();
+  if (!o) { document.getElementById('app').innerHTML = `<div class="tela"><div class="topo"><button class="voltar" onclick="voltar()">${I.voltar} Voltar</button></div><div class="vazio">Essa oferta saiu do ar.</div></div>`; return; }
+  const cat = CFG.cat[o.cat] || {};
+  const todos = o.grupo ? GRUPOS.get(o.grupo) : [o];
+  // uma linha por loja (a mesma loja pode vir de duas fontes): fica o menor preço dela
+  const grupo = todos.filter((x, i) => todos.findIndex(y => y.loja === x.loja) === i);
+  const maisBarato = grupo[0];
+  const curtido = !!S.curtidas[id];
+  const alerta = !!S.alertas[id];
+  const h = (await historico())[id] || [];
+  // mesma placa/processador (mesmo chip) mais barato em outro modelo
+  const mesmoChip = o.chip ? D.ofertas.filter(x => x.chip === o.chip && x.id !== id && x.pix < o.pix && !todos.includes(x)).sort((a, b) => a.pix - b.pix).slice(0, 3) : [];
+  const uso = o.perf ? [...PERF[o.cat === 'gpu' ? 'gpuUso' : 'cpuUso']].reverse().find(([min]) => o.perf >= min)?.[1] : null;
+  const off = desconto(o);
+  document.getElementById('app').innerHTML = `<div class="tela">
+    <div class="topo"><button class="voltar" onclick="voltar()">${I.voltar} Voltar</button>
+      <button style="color:var(--verde)" onclick="compartilhar('${esc(id)}')" aria-label="Compartilhar">${I.compartilhar}</button></div>
+    <div class="fotoGrande">${o.img ? `<img src="${esc(o.img)}" alt="" onerror="this.remove()">` : ''}</div>
+    <div class="titulo">${esc(o.t)}</div>
+    <div class="linha"><span class="precoGrande">${brl(o.pix)}</span><span class="nota" style="font-size:15px;padding:5px 11px">Nota ${o.nota}</span></div>
+    <div class="sub">${o.fonte === 'zoom' ? 'à vista' : 'no Pix'} · ${esc(o.loja)}${o.parc && o.parc > o.pix + 1 ? ` · ${brl(o.parc)} parcelado` : ''}${o.de ? ` · <s>${brl(o.de)}</s>` : ''}${o.importado ? ' · importado' : ''}</div>
+    ${o.cupom ? `<div class="aviso">Cupom: <b>${esc(o.cupom)}</b></div>` : ''}
+    ${maisBarato.pix < o.pix - 0.5 ? `<div class="aviso ruim">Está mais barato na ${esc(maisBarato.loja)}: ${brl(maisBarato.pix)} (${brl(o.pix - maisBarato.pix)} a menos)</div>` : grupo.length > 1 ? `<div class="aviso">Este é o menor preço entre ${grupo.length} lojas.</div>` : ''}
+    ${o.acima ? `<div class="aviso ruim">Atenção: o preço está acima do normal dos últimos dias.</div>` : ''}
+    <div class="acoes">
+      <a class="btn cheio" href="${esc(o.url)}" target="_blank" rel="noopener">Ver na loja</a>
+      <button class="btn ${curtido ? '' : 'fraco'}" aria-label="Curtir" onclick="curtir('${esc(id)}');telaProduto('${esc(id)}',true)">${curtido ? I.coracaoCheio : I.coracao}</button>
+      <button class="btn ${alerta ? '' : 'fraco'}" aria-label="Avisar quando baixar" onclick="avisar('${esc(id)}')">${alerta ? I.sinoCheio : I.sino}</button>
+    </div>
+    ${grupo.length > 1 || o.nlojas > 1 ? `<h2>Onde está mais barato</h2><div class="grupo">
+      ${grupo.map(x => `<a class="item ${x === maisBarato ? 'barato' : ''}" href="${esc(x.url)}" target="_blank" rel="noopener" style="color:inherit">
+        <span>${esc(x.loja)}<small>${esc(x.t.slice(0, 60))}</small></span><span class="dir">${brl(x.pix)}${x.loja === o.loja ? '<small>esta oferta</small>' : ''}</span></a>`).join('')}
+      ${o.nlojas > 1 ? `<a class="item" href="${esc(o.url)}" target="_blank" rel="noopener" style="color:inherit"><span>Comparar em ${o.nlojas} lojas no Zoom</span><span class="dir" style="color:var(--sec)">${I.seta}</span></a>` : ''}
+    </div>` : ''}
+    <h2>Nota ${o.nota} de 100</h2>
+    <div class="texto">
+      <div class="linha"><span>Preço em relação ao histórico</span><b>${o.np?.[0] ?? '-'}/50</b></div><div class="barraNota"><div style="width:${(o.np?.[0] || 0) * 2}%"></div></div>
+      <div class="linha" style="margin-top:12px"><span>Custo-benefício</span><b>${o.np?.[1] ?? '-'}/50</b></div><div class="barraNota"><div style="width:${(o.np?.[1] || 0) * 2}%"></div></div>
+      ${o.motivos?.length ? `<div class="sub" style="margin-top:10px">${o.motivos.map(esc).join(' · ')}</div>` : ''}
+    </div>
+    <h2>Histórico de preço</h2>
+    <div class="grafico">${grafico(h, o)}</div>
+    ${mesmoChip.length ? `<h2>Mesmo chip mais barato</h2><div class="grupo">${mesmoChip.map(x => `<button class="item" style="width:100%;text-align:left" onclick="abrir('${esc(x.id)}')"><span>${esc(x.t.slice(0, 70))}<small>${esc(x.loja)} · nota ${x.nota}</small></span><span class="dir">${brl(x.pix)}</span></button>`).join('')}</div>` : ''}
+    <h2>Para que serve</h2>
+    <div class="texto"><b>${esc(cat.nome || '')}</b>: ${esc(cat.serve || '')}
+      ${o.chip ? `<div style="margin-top:10px"><b>${esc(o.chip)}</b>${o.perf ? ` · desempenho ${o.perf} <span class="sub">(${o.cat === 'gpu' ? 'RTX 4060' : 'Ryzen 5 7600'} = 100)</span>` : ''}${uso ? `<br>${esc(uso)}.` : ''}</div>` : ''}
+      ${o.aval ? `<div class="sub" style="margin-top:8px">Avaliação na loja: ${o.aval[0]} de 5 (${o.aval[1]} avaliações)</div>` : ''}
+    </div>
+    <button class="mais" style="color:var(--sec)" onclick="ocultar('${esc(id)}')">Não tenho interesse</button>
+  </div>`;
+  if (!manterScroll) scrollTo(0, 0);
+}
+function grafico(h, o) {
+  if (h.length < 2) return `<div class="sub">O histórico começa a aparecer a partir da próxima atualização. Preço de hoje: ${brl(o.pix)}.</div>`;
+  const W = 320, H = 100, ps = h.map(x => x[1]), mn = Math.min(...ps), mx = Math.max(...ps), r = mx - mn || 1;
+  const pts = h.map(([, p], i) => `${(i / (h.length - 1)) * (W - 8) + 4},${H - 12 - ((p - mn) / r) * (H - 28)}`).join(' ');
+  const d = s => s.slice(8, 10) + '/' + s.slice(5, 7);
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="var(--verde)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>
+    <div class="linha sub"><span>${d(h[0][0])}</span><span>menor ${brl(mn)} · maior ${brl(mx)}</span><span>${d(h[h.length - 1][0])}</span></div>`;
+}
+function ocultar(id) { (S.ocultas ||= []).push(id); salvar(); toast('Não vai mais aparecer no feed'); voltar(); }
+async function compartilhar(id) {
+  const o = POR_ID.get(id);
+  const dados = { title: o.t, text: `${o.t} por ${brl(o.pix)} na ${o.loja}`, url: o.url };
+  try { if (navigator.share) await navigator.share(dados); else { await navigator.clipboard.writeText(dados.text + ' ' + o.url); toast('Link copiado'); } } catch (e) {}
+}
+
+// ---------- categorias ----------
+function telaCategorias() {
+  const conta = {}; for (const o of D.ofertas) conta[o.cat] = (conta[o.cat] || 0) + 1;
+  document.getElementById('app').innerHTML = `<div class="tela"><h1>Categorias</h1>
+    ${CFG.grupos.map(g => `<h2>${g.nome}</h2><div class="grupo">${CFG.categorias.filter(c => c.grupo === g.id).map(c => `
+      <button class="item" style="width:100%;text-align:left" onclick="S.grupo='${g.id}';S.cat='${c.id}';S.busca='';limite=40;salvar();irAba('ofertas')">
+        <span>${c.nome}<small>${conta[c.id] || 0} ofertas</small></span><span class="dir" style="color:var(--sec)">${I.seta}</span></button>`).join('')}</div>`).join('')}
+    <div class="sub" style="margin-top:16px">Em breve: "Montar PC" com questionário de orçamento e uso.</div>
+  </div>`;
+}
+
+// ---------- salvos ----------
+function telaSalvos() {
+  const ids = Object.keys(S.curtidas).sort((a, b) => S.curtidas[b].em - S.curtidas[a].em);
+  const alertas = Object.keys(S.alertas);
+  const linha = (id, x) => {
+    const o = POR_ID.get(id);
+    const agora = o?.pix, antes = x.pix;
+    const mudou = o && Math.abs(agora - antes) >= 1 ? (agora < antes ? `<small style="color:var(--verde)">baixou ${brl(antes - agora)}</small>` : `<small>subiu ${brl(agora - antes)}</small>`) : o ? '' : '<small>fora do ar</small>';
+    return `<button class="item" style="width:100%;text-align:left" onclick="${o ? `abrir('${esc(id)}')` : ''}">
+      <span style="display:flex;gap:10px;align-items:center;min-width:0"><span class="foto" style="width:48px;height:48px;flex:none;border-radius:8px">${x.img ? `<img src="${esc(x.img)}" alt="" onerror="this.remove()">` : ''}</span>
+      <span style="min-width:0"><span style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px">${esc(x.t)}</span><small>${esc(o?.loja || x.loja || '')}</small></span></span>
+      <span class="dir">${brl(agora ?? antes)}${mudou}</span></button>`;
+  };
+  document.getElementById('app').innerHTML = `<div class="tela"><h1>Salvos</h1>
+    ${ids.length ? `<div class="grupo">${ids.map(id => linha(id, S.curtidas[id])).join('')}</div>` : `<div class="vazio">Toque no coração de uma oferta para guardar aqui.<br>Você recebe aviso quando o preço cair.</div>`}
+    ${alertas.length ? `<h2>Avisos de preço</h2><div class="grupo">${alertas.map(id => linha(id, S.alertas[id])).join('')}</div>` : ''}
+  </div>`;
+}
+
+// ---------- perfil ----------
+function telaPerfil() {
+  const lojas = Object.entries(D.info.porFonte || {});
+  document.getElementById('app').innerHTML = `<div class="tela"><h1>Perfil</h1>
+    <h2>Aparência</h2>
+    <div class="seg">${[['auto', 'Automático'], ['claro', 'Claro'], ['escuro', 'Escuro']].map(([v, n]) => `<button class="${S.tema === v ? 'on' : ''}" onclick="S.tema='${v}';salvar();aplicarTema();telaPerfil()">${n}</button>`).join('')}</div>
+    <h2>Notificações</h2>
+    <div class="texto">
+      ${S.push ? `<div>Notificações ligadas neste aparelho.</div>` : `<div>Receba aviso quando um item salvo baixar de preço e quando aparecer uma oferta imperdível.</div>`}
+      <button class="btn cheio" style="width:100%;margin-top:12px" onclick="ativarPush()">${S.push ? 'Mandar notificação de teste' : 'Ativar notificações'}</button>
+      <div class="sub" style="margin-top:10px">No iPhone, funciona com o app adicionado à Tela de Início (Compartilhar → Adicionar à Tela de Início).</div>
+    </div>
+    <h2>Seu canal</h2>
+    <div class="texto"><div class="sub">É o código que liga este aparelho aos seus avisos. Para usar em outro aparelho, digite o mesmo código lá.</div>
+      <input class="campo" style="margin-top:8px;background:var(--card2)" value="${esc(canal())}" onchange="trocarCanal(this.value)"></div>
+    ${S.ocultas?.length ? `<h2>Ocultos</h2><button class="mais" onclick="S.ocultas=[];salvar();toast('Ofertas ocultas voltaram');telaPerfil()">Mostrar de novo ${S.ocultas.length} oferta(s) oculta(s)</button>` : ''}
+    <h2>De onde vêm as ofertas</h2>
+    <div class="grupo">${lojas.map(([k, v]) => `<div class="item"><span>${esc(k)}</span><span class="dir" style="color:var(--sec)">${v}</span></div>`).join('')}</div>
+    <div class="sub" style="margin-top:10px">Atualizado em ${D.info.atualizado ? new Date(D.info.atualizado).toLocaleString('pt-BR') : '-'}. KaBuM! direto da loja; Amazon, Magalu e Fast Shop pelo Zoom; Pichau, Terabyte, Mercado Livre e AliExpress pelas promoções do Promobit. Preços podem mudar na loja.</div>
+  </div>`;
+}
+
+// ---------- notificações (Web Push) e sincronização ----------
+const VAPID = 'BL2PBNUFF265IC9A2CA_V_QDdXJU2UdgbxpK25ChM4ipst6CFg4_cRgxYG-opSrpsNJ7ZLlI8nSR1vYkX-_Hd_U';
+const REGISTRO = 'pcofertas-reg-qumgo2c46jisml';
+function canal() {
+  if (!S.canal) { S.canal = 'pc-' + Array.from(crypto.getRandomValues(new Uint8Array(9)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join(''); salvar(); }
+  return S.canal;
+}
+function trocarCanal(v) { v = v.trim(); if (v.length < 8) return toast('Código muito curto'); S.canal = v; salvar(); sincronizar(); toast('Canal trocado'); }
+let _sync;
+function sincronizar() {
+  clearTimeout(_sync);
+  _sync = setTimeout(async () => {
+    const prefs = { em: Date.now(), curtidas: Object.fromEntries(Object.entries(S.curtidas).map(([k, v]) => [k, v.pix])), alertas: Object.fromEntries(Object.entries(S.alertas).map(([k, v]) => [k, v.base])), pushes: S.push ? [S.push] : [] };
+    try { await fetch('https://ntfy.sh/' + canal() + '-prefs', { method: 'POST', body: JSON.stringify(prefs) }); } catch (e) {}
+  }, 800);
+}
+function b64(s) { const p = '='.repeat((4 - s.length % 4) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(r, c => c.charCodeAt(0)); }
+async function ativarPush() {
+  if (S.push) {
+    try { await fetch('https://ntfy.sh/' + REGISTRO, { method: 'POST', body: JSON.stringify({ canal: canal(), teste: Date.now() }) }); } catch (e) {}
+    return toast('Pedido de teste enviado. A notificação chega na próxima rodada do robô.');
+  }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return toast('Adicione o app à Tela de Início primeiro');
+  try {
+    const reg = await navigator.serviceWorker.register('sw.js');
+    await navigator.serviceWorker.ready;
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') return toast('Notificações não permitidas');
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(VAPID) });
+    S.push = sub.toJSON(); salvar();
+    await fetch('https://ntfy.sh/' + REGISTRO, { method: 'POST', body: JSON.stringify({ canal: canal(), em: Date.now() }) });
+    sincronizar(); toast('Notificações ativadas'); telaPerfil();
+  } catch (e) { toast('Não deu para ativar: ' + e.message); }
+}
+
+// ---------- início ----------
+(async () => {
+  document.getElementById('app').innerHTML = `<div class="tela"><h1>Ofertas</h1><div class="grade">${'<div class="esqueleto"></div>'.repeat(6)}</div></div>`;
+  abas();
+  try { await carregar(); } catch (e) { document.getElementById('app').innerHTML = `<div class="tela"><h1>Ofertas</h1><div class="vazio">Não consegui carregar as ofertas. Verifique a internet.</div></div>`; return; }
+  canal();
+  rota();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+})();
+</script>
+</body>
+</html>

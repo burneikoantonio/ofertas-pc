@@ -1,0 +1,93 @@
+name: Atualizar ofertas
+
+on:
+  schedule:
+    # dias normais: 8h, 13h e 19h (horário de Brasília)
+    - cron: '0 11,16,22 1-23 11 *'
+    - cron: '0 11,16,22 * 1-10 *'
+    - cron: '0 11,16,22 2-31 12 *'
+    # semana da Black Friday (24/11 a 01/12): de hora em hora
+    - cron: '0 * 24-30 11 *'
+    - cron: '0 * 1 12 *'
+  workflow_dispatch:
+    inputs:
+      so_avisos:
+        description: "Só rodar os avisos (sem coletar preços)"
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ofertas
+  cancel-in-progress: false
+
+env:
+  TZ: America/Sao_Paulo
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.site.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Coletar preços das lojas
+        if: ${{ !inputs.so_avisos }}
+        run: ruby coletar.rb
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Recuperar canais e preferências dos celulares
+        uses: actions/cache/restore@v4
+        with:
+          path: .prefs
+          key: prefs-${{ github.run_id }}
+          restore-keys: prefs-
+
+      - name: Instalar o envio de notificações
+        run: npm install --no-save --no-package-lock web-push@3
+
+      - name: Mandar avisos para os celulares
+        env:
+          VAPID_PUBLIC: ${{ vars.VAPID_PUBLIC }}
+          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          REGISTRO: ${{ vars.REGISTRO }}
+        run: node alertas.js
+
+      - name: Guardar canais e preferências
+        if: ${{ always() }}
+        uses: actions/cache/save@v4
+        with:
+          path: .prefs
+          key: prefs-${{ github.run_id }}
+
+      - name: Salvar os preços novos
+        if: ${{ !inputs.so_avisos }}
+        run: |
+          git config user.name "ofertas-bot"
+          git config user.email "ofertas-bot@users.noreply.github.com"
+          git add app/data
+          git diff --cached --quiet || git commit -m "Atualiza preços $(date '+%d/%m %H:%M')"
+          git pull --rebase -X theirs --quiet origin main
+          git push
+
+      - name: Preparar o site
+        if: ${{ !cancelled() }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: app
+
+      - name: Publicar no GitHub Pages
+        if: ${{ !cancelled() }}
+        id: site
+        uses: actions/deploy-pages@v4
