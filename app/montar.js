@@ -110,7 +110,8 @@ function escolherPerifericos(p) {
   // periféricos de faixa de preço boa (nem os mais baratos, que costumam ser fracos), com a maior nota
   const faixa = (cat, min, max) => candidatos(cat).filter(o => o.pix >= min && o.pix <= max && bemAvaliado(o)).sort((a, b) => b.nota - a.nota)[0];
   const folga = p.orc >= 10000 ? 1.6 : 1;
-  if (p.incluir?.includes('kit')) { r.mouse = faixa('mouse', 80, 250 * folga); r.teclado = faixa('teclado', 120, 350 * folga); }
+  if (p.incluir?.includes('mouse') || p.incluir?.includes('kit')) r.mouse = faixa('mouse', 80, 250 * folga);
+  if (p.incluir?.includes('teclado') || p.incluir?.includes('kit')) r.teclado = faixa('teclado', 120, 350 * folga);
   if (p.incluir?.includes('headset')) r.headset = faixa('headset', 120, 400 * folga);
   for (const k in r) if (!r[k]) delete r[k];
   return r;
@@ -197,6 +198,48 @@ function montar(p) {
   return { ids, cabe: !!melhor };
 }
 
+// ---------- upgrades para os periféricos que a pessoa já tem ----------
+// acha no catálogo o produto mais parecido com o que a pessoa escreveu (ex.: "logitech g203")
+function parecidoCom(cat, texto) {
+  const ws = norm(texto).split(/[^a-z0-9]+/).filter(w => w.length >= 2);
+  if (!ws.length) return null;
+  let melhor = null, pts = 0;
+  for (const o of candidatos(cat)) {
+    const t = norm(o.t);
+    const p = ws.filter(w => t.includes(w)).length + (ws.some(w => /\d/.test(w) && t.includes(w)) ? 1 : 0);
+    if (p > pts) { pts = p; melhor = o; }
+  }
+  return pts >= 2 ? melhor : null;
+}
+function upgrades(p) {
+  const r = [];
+  const nomes = { monitor: 'Monitor', mouse: 'Mouse', teclado: 'Teclado', headset: 'Headset' };
+  for (const [k, v] of Object.entries(p.perif || {})) {
+    if (v !== 'tenho') continue;
+    const texto = p.tenho?.[k] || '', ref = texto ? parecidoCom(k, texto) : null;
+    let sug = [];
+    if (k === 'monitor') {
+      const t = norm(texto);
+      const hz = +(t.match(/(\d{2,3})\s?hz/)?.[1] || (ref && spec(ref).hz) || 60);
+      const res = /4k|uhd/.test(t) ? '4k' : /2k|qhd|1440/.test(t) ? '2k' : (ref && spec(ref).res) || 'fhd';
+      const nivel = { fhd: 1, '2k': 2, '4k': 3 };
+      const alvo = p.uso === 'jogos' ? (p.tela || res) : res;
+      sug = candidatos('monitor').filter(o => { const s = spec(o); return s.res && bemAvaliado(o) && o.pix <= 4000 && ((nivel[s.res] > nivel[res] && s.res === alvo) || (s.res === res && s.hz >= hz + 60)); })
+        .sort((a, b) => b.nota - a.nota).slice(0, 2)
+        .map(o => ({ ...o, motivo: spec(o).res !== res ? `de ${res.toUpperCase()} para ${spec(o).res.toUpperCase()}: imagem mais nítida` : `de ${hz}Hz para ${spec(o).hz}Hz: jogo bem mais fluido` }));
+    } else {
+      const base = ref ? ref.pix * 1.3 : { mouse: 120, teclado: 180, headset: 180 }[k];
+      // nunca sugerir o mesmo modelo que a pessoa já tem (ex.: "g203")
+      const modelo = norm(texto).split(/[^a-z0-9]+/).filter(w => /\d/.test(w) && w.length >= 2);
+      sug = candidatos(k).filter(o => bemAvaliado(o) && o.pix >= base && o.pix <= Math.max(base * 3, 500) && o.id !== ref?.id && !modelo.some(w => norm(o.t).includes(w)))
+        .sort((a, b) => b.nota - a.nota || a.pix - b.pix).slice(0, 2)
+        .map(o => ({ ...o, motivo: ref ? 'um degrau acima do seu' : 'bem avaliado' }));
+    }
+    r.push({ nome: nomes[k], tenho: texto, ref, sugestoes: sug });
+  }
+  return r;
+}
+
 // alternativas compatíveis para trocar uma peça
 function alternativas(vaga, atuais) {
   const cpu = atuais.cpu, mb = atuais['placa-mae'], gpu = atuais.gpu;
@@ -243,7 +286,7 @@ const PERGUNTAS = [
   { id: 'jogo', q: 'Que tipo de jogo?', so: p => p.uso === 'jogos', op: [['leves', 'Competitivos e leves', 'CS2, Valorant, LoL, Fortnite, Minecraft'], ['pesados', 'Lançamentos pesados', 'GTA, Cyberpunk, Black Myth, Call of Duty'], ['ambos', 'Um pouco de tudo', 'Quero rodar bem os dois tipos']] },
   { id: 'tela', q: 'Em que resolução você quer jogar?', so: p => p.uso === 'jogos', op: [['fhd', 'Full HD (1080p)', 'Monitor comum de 24". Mais FPS gastando menos'], ['2k', '2K (1440p)', 'Imagem mais nítida, pede placa de vídeo melhor'], ['4k', '4K', 'Máxima nitidez, o mais caro']] },
   { id: 'orc', q: 'Quanto você quer gastar no total?', tipo: 'orc' },
-  { id: 'incluir', q: 'O que mais precisa entrar no orçamento?', multi: true, op: [['monitor', 'Monitor', 'Ainda não tenho monitor'], ['kit', 'Mouse e teclado', 'Preciso de mouse e teclado'], ['headset', 'Headset', 'Fone com microfone']] },
+  { id: 'perif', q: 'E os periféricos?', tipo: 'perif' },
   { id: 'marcas', q: 'Tem preferência de marca?', tipo: 'marcas' },
 ];
 
@@ -266,6 +309,15 @@ function perguntar(i) {
       <div class="chips" style="justify-content:center;flex-wrap:wrap">${[3000, 4500, 6000, 8000, 10000, 15000].map(v => `<button class="chip" onclick="S.pcPerfil.orc=${v};salvar();perguntar(${i})">${brl(v)}</button>`).join('')}</div>
       <div class="sub" style="text-align:center;margin-top:6px">Preço no Pix, somando todas as peças${p.incluir?.length ? ' e periféricos' : ''}.</div>
       <button class="btn" style="width:100%;margin-top:20px" onclick="perguntar(${i + 1})">Continuar</button>`;
+  } else if (q.tipo === 'perif') {
+    p.perif ||= {}; p.tenho ||= {};
+    const itens = [['monitor', 'Monitor', 'ex.: AOC 24" 75Hz'], ['mouse', 'Mouse', 'ex.: Logitech G203'], ['teclado', 'Teclado', 'ex.: Redragon Kumara'], ['headset', 'Headset', 'ex.: HyperX Cloud Stinger']];
+    corpo = `<div class="sub" style="margin-bottom:12px">"Preciso" entra no orçamento. Se você já tem, conte qual é que eu sugiro upgrades (fora do orçamento).</div>
+      ${itens.map(([k, nome, ex]) => `<div class="texto" style="margin-bottom:10px"><b>${nome}</b>
+        <div class="seg" style="margin-top:8px">${[['preciso', 'Preciso'], ['tenho', 'Já tenho'], ['nao', 'Não quero']].map(([v, n]) => `<button class="${(p.perif[k] || 'nao') === v ? 'on' : ''}" onclick="S.pcPerfil.perif['${k}']='${v}';salvar();perguntar(${i})">${n}</button>`).join('')}</div>
+        ${p.perif[k] === 'tenho' ? `<input class="campo" style="margin-top:8px;background:var(--card2)" placeholder="Qual? ${ex}" value="${esc(p.tenho[k] || '')}" onchange="S.pcPerfil.tenho['${k}']=this.value.trim().slice(0,60);salvar()">` : ''}
+      </div>`).join('')}
+      <button class="btn" style="width:100%;margin-top:10px" onclick="S.pcPerfil.incluir=Object.keys(S.pcPerfil.perif).filter(k=>S.pcPerfil.perif[k]==='preciso');salvar();perguntar(${i + 1})">Continuar</button>`;
   } else if (q.tipo === 'marcas') {
     const grupo = (campo, ops) => `<div class="seg" style="margin-bottom:14px">${ops.map(([v, n]) => `<button class="${(p[campo] || '') === v ? 'on' : ''}" onclick="S.pcPerfil.${campo}='${v}';salvar();perguntar(${i})">${n}</button>`).join('')}</div>`;
     corpo = `<div class="sub" style="margin-bottom:6px">Processador</div>${grupo('marcaCpu', [['', 'Tanto faz'], ['amd', 'AMD'], ['intel', 'Intel']])}
@@ -329,6 +381,11 @@ function mostrarPC() {
         </div>
         <div class="pr">${brl(o.pix)}<div class="sub" style="font-weight:400">${esc(o.loja)}</div></div>
       </div>`; }).join('')}
+    ${(() => { const u = upgrades(p); return u.length ? `<h2>Upgrades para o que você já tem</h2><div class="sub">Fora do orçamento do PC.</div>${u.map(x => `
+      <div class="texto" style="margin-top:8px"><div class="rotulo" style="font-size:12px;color:var(--verde);font-weight:600;text-transform:uppercase">${x.nome}</div>
+        <div class="sub">Você tem: ${esc(x.tenho || 'não informado')}${x.ref ? ` (parecido com um de ${brl(x.ref.pix)})` : ''}</div>
+        ${x.sugestoes.map(o => `<button class="item" style="width:100%;text-align:left;padding:10px 0" onclick="abrir('${esc(o.id)}')"><span style="min-width:0">${esc(o.t.slice(0, 70))}<small>${esc(o.motivo)} · nota ${o.nota} · ${esc(o.loja)}</small></span><span class="dir">${brl(o.pix)}</span></button>`).join('') || '<div class="sub" style="margin-top:6px">O seu já é muito bom: não achei upgrade que valha a pena hoje.</div>'}
+      </div>`).join('')}` : ''; })()}
     <h2>Compatibilidade</h2>
     <div class="texto">${checagens(pc).map(([ok, txt]) => `<div class="compat"><span class="${ok ? 'ok' : 'nao'}">${ok ? I.check : I.alerta}</span><span>${esc(txt)}</span></div>`).join('')}</div>
     <div class="acoes" style="flex-direction:column">

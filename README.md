@@ -1,4 +1,4 @@
-# Ofertas PC
+# Tekko
 
 App (para iPhone, pela Tela de Início) que junta ofertas de peças de computador, periféricos, monitores, PCs, notebooks, consoles e jogos de PS5/PS4, dá uma nota de 0 a 100 para cada oferta e mostra em qual loja o mesmo produto está mais barato.
 

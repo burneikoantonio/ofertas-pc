@@ -59,6 +59,25 @@ if (process.env.VAPID_PUBLIC && process.env.VAPID_PRIVATE) {
   // imperdíveis: nota alta ou queda forte em relação ao preço normal
   const imperdiveis = ofertas.filter(o => o.nota >= 80 || (o.ref && o.pix <= o.ref * 0.85)).sort((a, b) => b.nota - a.nota);
 
+  // mural de cada grupo "Juntos": cópia guardada pelo robô + o que chegou no ntfy desde a última rodada
+  const murais = new Map();
+  async function mural(grupo) {
+    if (murais.has(grupo)) return murais.get(grupo);
+    const m = ler(path.join(PREFS, `mural-${grupo}.json`), { itens: {}, apagados: [] });
+    const apagados = new Set(m.apagados);
+    for (const x of await ntfy(`${grupo}-mural`)) {
+      if (x.tipo === 'rec' && x.chave) m.itens[x.chave] ||= x;
+      if (x.tipo === 'del' && x.chave) apagados.add(x.chave);
+      if (x.tipo === 'copia') { for (const r of x.itens || []) m.itens[r.chave] ||= r; for (const k of x.apagados || []) apagados.add(k); }
+    }
+    for (const k of apagados) delete m.itens[k];
+    // guarda só os últimos 60 dias (no máximo 150 recomendações)
+    m.itens = Object.fromEntries(Object.values(m.itens).filter(r => agora - r.em < 60 * 864e5).sort((a, b) => b.em - a.em).slice(0, 150).map(r => [r.chave, r]));
+    m.apagados = [...apagados].slice(-300);
+    murais.set(grupo, m);
+    return m;
+  }
+
   let total = 0;
   for (const canal of canais) {
     const arqP = path.join(PREFS, `prefs-${canal}.json`), arqE = path.join(PREFS, `enviados-${canal}.json`);
@@ -89,7 +108,22 @@ if (process.env.VAPID_PUBLIC && process.env.VAPID_PRIVATE) {
       }
     }
 
-    if (testes.has(canal)) await enviar('Ofertas PC', 'Teste: as notificações estão chegando. Toque para abrir as ofertas.', SITE || './', 'teste');
+    if (testes.has(canal)) await enviar('Tekko', 'Teste: as notificações estão chegando. Toque para abrir as ofertas.', SITE || './', 'teste');
+
+    // 1. recomendações da outra pessoa do grupo (até 5 por rodada; de madrugada esperam)
+    const m = /^tk-[a-z0-9]{8,}$/.test(prefs.grupo || '') ? await mural(prefs.grupo) : null;
+    if (!SILENCIO && m) {
+      let n = 0;
+      for (const r of Object.values(m.itens).sort((a, b) => a.em - b.em)) {
+        const chave = `rec|${r.chave}`;
+        if (r.canal === canal || enviados[chave]) continue;
+        if (agora - r.em > 3 * 864e5) { enviados[chave] = hoje; continue; } // recomendação antiga: não avisa
+        if (n >= 5) break;
+        await enviar(`${String(r.de || 'Alguém').slice(0, 20)} recomendou`, `${String(r.t).slice(0, 80)}\n${brl(r.pix)} na ${r.loja}${r.msg ? `\n“${String(r.msg).slice(0, 120)}”` : ''}`,
+          SITE ? `${SITE}/#juntos` : './', `rec-${r.chave}`, r.img);
+        enviados[chave] = hoje; n++;
+      }
+    }
 
     if (!SILENCIO) {
       // 2. itens curtidos e avisos de preço: baixou desde que você salvou (ou chegou no menor preço já visto)
@@ -129,5 +163,23 @@ if (process.env.VAPID_PUBLIC && process.env.VAPID_PRIVATE) {
     if (!DRY) try { await fetch(`https://ntfy.sh/${canal}-prefs`, { method: 'POST', body: JSON.stringify({ ...prefs, mortos: undefined }) }); } catch (e) {}
     console.log(`Canal ${canal.slice(0, 6)}…: ${prefs.pushes.length} aparelho(s), ${ok} enviada(s), ${erro} erro(s)`);
   }
+  // guarda os murais e republica uma cópia no ntfy (que apaga depois de 12h) para os celulares sempre acharem
+  for (const [grupo, m] of murais) {
+    gravar(path.join(PREFS, `mural-${grupo}.json`), m);
+    if (DRY) continue;
+    // o ntfy aceita mensagens de até 4 KB: manda a cópia em pedaços
+    const pedacos = [[]];
+    let tam = 0;
+    for (const r of Object.values(m.itens)) {
+      const t = JSON.stringify(r).length;
+      if (tam + t > 3200 && pedacos[pedacos.length - 1].length) { pedacos.push([]); tam = 0; }
+      pedacos[pedacos.length - 1].push(r); tam += t;
+    }
+    for (const [i, itens] of pedacos.entries()) {
+      const corpo = { tipo: 'copia', itens, apagados: i === 0 ? m.apagados.slice(-20) : [] };
+      try { await fetch(`https://ntfy.sh/${grupo}-mural`, { method: 'POST', body: JSON.stringify(corpo) }); } catch (e) {}
+    }
+  }
+  console.log(`${murais.size} grupo(s) Juntos`);
   console.log(`${canais.size} canal(is), ${total} aviso(s)${SILENCIO ? ' (horário de silêncio: só testes)' : ''}`);
 })();

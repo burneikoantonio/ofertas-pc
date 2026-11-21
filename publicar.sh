@@ -10,8 +10,8 @@ MSG=${1:-"Atualiza o app"}
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-# o celular sempre baixa a versão nova do Montar PC (evita cópia antiga em cache)
-sed -i "" -E "s/montar\.js\?v=[0-9]+/montar.js?v=$(date +%s)/" app/index.html
+# o celular sempre baixa a versão nova do Montar PC e do Juntos (evita cópia antiga em cache)
+sed -i "" -E "s/(montar|juntos)\.js\?v=[0-9]+/\1.js?v=$(date +%s)/g" app/index.html
 
 excluir_dados=(-not -path './app/data/*')
 [ "${INCLUIR_DADOS:-0}" = 1 ] && excluir_dados=()

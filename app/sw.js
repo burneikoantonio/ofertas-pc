@@ -5,8 +5,8 @@ self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 
 self.addEventListener('push', e => {
   let d = {};
-  try { d = e.data ? e.data.json() : {}; } catch (_) { d = { title: 'Ofertas PC', body: e.data ? e.data.text() : '' }; }
-  e.waitUntil(self.registration.showNotification(d.title || 'Ofertas PC', {
+  try { d = e.data ? e.data.json() : {}; } catch (_) { d = { title: 'Tekko', body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Tekko', {
     body: d.body || '',
     icon: d.image || 'icone-192.png',
     badge: 'icone-192.png',
