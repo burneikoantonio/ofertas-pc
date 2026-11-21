@@ -90,4 +90,14 @@ jobs:
       - name: Publicar no GitHub Pages
         if: ${{ !cancelled() }}
         id: site
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      # o GitHub às vezes falha na primeira tentativa ("Fetching artifact metadata failed"): espera e tenta de novo
+      - name: Esperar antes de tentar de novo
+        if: ${{ steps.site.outcome == 'failure' }}
+        run: sleep 60
+
+      - name: Publicar no GitHub Pages (2ª tentativa)
+        if: ${{ steps.site.outcome == 'failure' }}
         uses: actions/deploy-pages@v4
