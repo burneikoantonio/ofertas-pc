@@ -9,7 +9,7 @@ self.addEventListener('push', e => {
   e.waitUntil(self.registration.showNotification(d.title || 'Tekko', {
     body: d.body || '',
     icon: d.image || 'icone-192.png',
-    badge: 'icone-192.png',
+    badge: 'badge.png', // Android: ícone pequeno só com o formato (branco sobre transparente)
     tag: d.tag || undefined,
     data: { url: d.url || './' },
   }));
