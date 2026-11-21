@@ -1,104 +1,614 @@
 {
   "grupos": [
-    { "id": "pecas", "nome": "Peças" },
-    { "id": "perifericos", "nome": "Periféricos" },
-    { "id": "monitores", "nome": "Monitores" },
-    { "id": "prontos", "nome": "PCs e notebooks" },
-    { "id": "games", "nome": "Games" }
+    {
+      "id": "pecas",
+      "nome": "Peças"
+    },
+    {
+      "id": "perifericos",
+      "nome": "Periféricos"
+    },
+    {
+      "id": "monitores",
+      "nome": "Monitores"
+    },
+    {
+      "id": "prontos",
+      "nome": "PCs e notebooks"
+    },
+    {
+      "id": "games",
+      "nome": "Games"
+    }
   ],
   "categorias": [
-    { "id": "gpu", "nome": "Placa de vídeo", "grupo": "pecas", "icone": "ti-device-desktop",
+    {
+      "id": "gpu",
+      "nome": "Placa de vídeo",
+      "grupo": "pecas",
+      "icone": "ti-device-desktop",
       "serve": "Desenha as imagens dos jogos. É a peça que mais define em que qualidade e quantos FPS você joga.",
-      "kabum": ["placa de video"], "menu": "Placa de vídeo \\(VGA\\)/Placa de vídeo", "zoom": ["placa de video"], "zoomCat": ["Placa de Video"],
-      "re": "^placa de v[ií]deo|\\b(geforce|radeon)\\b|\\b(rtx|gtx)\\s?\\d{4}|\\brx\\s?\\d{4}" },
-    { "id": "cpu", "nome": "Processador", "grupo": "pecas", "icone": "ti-cpu",
+      "kabum": [
+        "placa de video",
+        "placa de video rtx",
+        "placa de video radeon"
+      ],
+      "menu": "Placa de vídeo \\(VGA\\)/Placa de vídeo",
+      "zoom": [
+        "placa de video",
+        "placa de video rtx",
+        "placa de video radeon"
+      ],
+      "zoomCat": [
+        "Placa de Video"
+      ],
+      "re": "^placa de v[ií]deo|\\b(geforce|radeon)\\b|\\b(rtx|gtx)\\s?\\d{4}|\\brx\\s?\\d{4}"
+    },
+    {
+      "id": "cpu",
+      "nome": "Processador",
+      "grupo": "pecas",
+      "icone": "ti-cpu",
       "serve": "O cérebro do PC: roda o sistema, os programas e a lógica dos jogos. Precisa combinar com a placa-mãe (soquete AM4, AM5, LGA1700...).",
-      "kabum": ["processador"], "menu": "^Hardware/Processadores", "zoom": ["processador"], "zoomCat": ["Processador"],
-      "re": "^processador|^(amd )?ryzen [3579]|^intel core" },
-    { "id": "placa-mae", "nome": "Placa-mãe", "grupo": "pecas", "icone": "ti-circuit-board",
+      "kabum": [
+        "processador",
+        "processador amd ryzen",
+        "processador intel core"
+      ],
+      "menu": "^Hardware/Processadores",
+      "zoom": [
+        "processador",
+        "processador ryzen",
+        "processador intel"
+      ],
+      "zoomCat": [
+        "Processador"
+      ],
+      "re": "^processador|^(amd )?ryzen [3579]|^intel core"
+    },
+    {
+      "id": "placa-mae",
+      "nome": "Placa-mãe",
+      "grupo": "pecas",
+      "icone": "ti-circuit-board",
       "serve": "Liga todas as peças. Define qual processador e qual memória (DDR4 ou DDR5) você pode usar.",
-      "kabum": ["placa mae"], "menu": "Placas-mãe/Placa-Mãe", "zoom": ["placa mae"], "zoomCat": ["Placa Mãe"],
-      "re": "^placa[- ]m[ãa]e" },
-    { "id": "ram", "nome": "Memória RAM", "grupo": "pecas", "icone": "ti-cpu-2",
+      "kabum": [
+        "placa mae",
+        "placa mae am5",
+        "placa mae lga1700"
+      ],
+      "menu": "Placas-mãe/Placa-Mãe",
+      "zoom": [
+        "placa mae",
+        "placa mae am4",
+        "placa mae am5"
+      ],
+      "zoomCat": [
+        "Placa Mãe"
+      ],
+      "re": "^placa[- ]m[ãa]e"
+    },
+    {
+      "id": "ram",
+      "nome": "Memória RAM",
+      "grupo": "pecas",
+      "icone": "ti-cpu-2",
       "serve": "Memória de curto prazo: deixa abrir muitos programas e abas sem travar. Para jogos hoje, 16 GB é o mínimo e 32 GB é o confortável.",
-      "kabum": ["memoria ram ddr4", "memoria ram ddr5"], "menu": "Memória RAM", "zoom": ["memoria ram"], "zoomCat": ["Memória RAM"],
-      "re": "^mem[oó]ria (ram|ddr|gamer|desktop)|^mem[oó]ria .*\\bddr[45]\\b" },
-    { "id": "ssd", "nome": "SSD", "grupo": "pecas", "icone": "ti-database",
+      "kabum": [
+        "memoria ram ddr4",
+        "memoria ram ddr5",
+        "memoria ram 16gb",
+        "memoria ram 32gb"
+      ],
+      "menu": "Memória RAM",
+      "zoom": [
+        "memoria ram",
+        "memoria ram ddr5"
+      ],
+      "zoomCat": [
+        "Memória RAM"
+      ],
+      "re": "^mem[oó]ria (ram|ddr|gamer|desktop)|^mem[oó]ria .*\\bddr[45]\\b"
+    },
+    {
+      "id": "externo",
+      "nome": "HD e SSD externo",
+      "grupo": "pecas",
+      "icone": "ti-device-sd-card",
+      "serve": "Armazenamento portátil para backup, fotos e jogos. SSD externo é bem mais rápido que HD externo.",
+      "kabum": [
+        "hd externo",
+        "ssd externo"
+      ],
+      "menu": "Pessoal/Externo|SSD Externo",
+      "zoom": [
+        "hd externo",
+        "ssd externo"
+      ],
+      "zoomCat": [
+        "HD Externo",
+        "SSD Externo"
+      ],
+      "re": "^(hd|ssd) (externo|portatil)"
+    },
+    {
+      "id": "ssd",
+      "nome": "SSD",
+      "grupo": "pecas",
+      "icone": "ti-database",
       "serve": "Onde ficam guardados o sistema, os jogos e os arquivos. SSD NVMe é o mais rápido: o PC liga e os jogos carregam em segundos.",
-      "kabum": ["ssd nvme", "ssd"], "menu": "Hardware/SSD/SSD (SATA|PCIe|M\\.2)", "zoom": ["ssd nvme", "ssd sata"], "zoomCat": ["SSD"],
-      "re": "^ssd\\b|\\bssd (nvme|m\\.?2|sata)" },
-    { "id": "fonte", "nome": "Fonte", "grupo": "pecas", "icone": "ti-plug",
+      "kabum": [
+        "ssd nvme",
+        "ssd",
+        "ssd 1tb",
+        "ssd 2tb"
+      ],
+      "menu": "Hardware/SSD/SSD (SATA|PCIe|M\\.2)",
+      "zoom": [
+        "ssd nvme",
+        "ssd sata",
+        "ssd 1tb"
+      ],
+      "zoomCat": [
+        "SSD"
+      ],
+      "re": "^ssd\\b|\\bssd (nvme|m\\.?2|sata)"
+    },
+    {
+      "id": "fonte",
+      "nome": "Fonte",
+      "grupo": "pecas",
+      "icone": "ti-plug",
       "serve": "Dá energia para tudo. Uma fonte boa (selo 80 Plus) protege as outras peças; a potência (W) precisa aguentar a placa de vídeo.",
-      "kabum": ["fonte"], "menu": "Hardware/Fontes", "zoom": ["fonte atx"], "zoomCat": ["Fonte para PC", "Fonte ATX", "Fonte"],
-      "re": "^fonte\\b.*\\d{3,4}\\s?w" },
-    { "id": "gabinete", "nome": "Gabinete", "grupo": "pecas", "icone": "ti-box",
+      "kabum": [
+        "fonte",
+        "fonte 80 plus",
+        "fonte modular"
+      ],
+      "menu": "Hardware/Fontes",
+      "zoom": [
+        "fonte atx",
+        "fonte 80 plus"
+      ],
+      "zoomCat": [
+        "Fonte para PC",
+        "Fonte ATX",
+        "Fonte"
+      ],
+      "re": "^fonte\\b.*\\d{3,4}\\s?w"
+    },
+    {
+      "id": "gabinete",
+      "nome": "Gabinete",
+      "grupo": "pecas",
+      "icone": "ti-box",
       "serve": "A caixa do PC. Precisa caber a placa-mãe e a placa de vídeo, e ter boa ventilação.",
-      "kabum": ["gabinete gamer"], "menu": "Gabinetes/Gabinete", "zoom": ["gabinete gamer"], "zoomCat": ["Gabinete"],
-      "re": "^gabinete" },
-    { "id": "cooler", "nome": "Cooler", "grupo": "pecas", "icone": "ti-propeller",
+      "kabum": [
+        "gabinete gamer"
+      ],
+      "menu": "Gabinetes/Gabinete",
+      "zoom": [
+        "gabinete gamer"
+      ],
+      "zoomCat": [
+        "Gabinete"
+      ],
+      "re": "^gabinete"
+    },
+    {
+      "id": "cooler",
+      "nome": "Cooler",
+      "grupo": "pecas",
+      "icone": "ti-propeller",
       "serve": "Esfria o processador (air cooler ou water cooler) e o gabinete (fans). Menos calor = mais desempenho e menos barulho.",
-      "kabum": ["water cooler", "air cooler"], "menu": "Hardware/Coolers/(Water|Air|FAN)", "zoom": ["water cooler"], "zoomCat": ["Cooler", "Water Cooler"],
-      "re": "^(water ?cooler|air ?cooler|cooler|kit (de )?ventoinhas?|kit fans?|ventoinha|fan )" },
-    { "id": "mouse", "nome": "Mouse", "grupo": "perifericos", "icone": "ti-mouse",
+      "kabum": [
+        "water cooler",
+        "air cooler"
+      ],
+      "menu": "Hardware/Coolers/(Water|Air|FAN)",
+      "zoom": [
+        "water cooler"
+      ],
+      "zoomCat": [
+        "Cooler",
+        "Water Cooler"
+      ],
+      "re": "^(water ?cooler|air ?cooler|cooler|kit (de )?ventoinhas?|kit fans?|ventoinha|fan )"
+    },
+    {
+      "id": "mouse",
+      "nome": "Mouse",
+      "grupo": "perifericos",
+      "icone": "ti-mouse",
       "serve": "Para jogos, conta o sensor preciso e o peso leve. Sem fio de boa marca já tem atraso imperceptível.",
-      "kabum": ["mouse gamer"], "menu": "Periféricos/Mouse Gamer", "zoom": ["mouse gamer"], "zoomCat": ["Mouse"],
-      "re": "^mouse\\b(?!\\s?pad)" },
-    { "id": "teclado", "nome": "Teclado", "grupo": "perifericos", "icone": "ti-keyboard",
+      "kabum": [
+        "mouse gamer",
+        "mouse sem fio"
+      ],
+      "menu": "Periféricos/Mouse Gamer",
+      "zoom": [
+        "mouse gamer",
+        "mouse sem fio"
+      ],
+      "zoomCat": [
+        "Mouse"
+      ],
+      "re": "^mouse\\b(?!\\s?pad)"
+    },
+    {
+      "id": "teclado",
+      "nome": "Teclado",
+      "grupo": "perifericos",
+      "icone": "ti-keyboard",
       "serve": "Teclado mecânico dura mais e responde melhor. Tamanhos menores (60%, 65%, TKL) deixam mais espaço para o mouse.",
-      "kabum": ["teclado gamer"], "menu": "Periféricos/Teclado Gamer/(Com|Sem) Fio", "zoom": ["teclado gamer"], "zoomCat": ["Teclado"],
-      "re": "^teclado" },
-    { "id": "headset", "nome": "Headset", "grupo": "perifericos", "icone": "ti-headset",
+      "kabum": [
+        "teclado gamer",
+        "teclado mecanico"
+      ],
+      "menu": "Periféricos/Teclado Gamer/(Com|Sem) Fio",
+      "zoom": [
+        "teclado gamer",
+        "teclado mecanico"
+      ],
+      "zoomCat": [
+        "Teclado"
+      ],
+      "re": "^teclado"
+    },
+    {
+      "id": "headset",
+      "nome": "Headset",
+      "grupo": "perifericos",
+      "icone": "ti-headset",
       "serve": "Fone com microfone: ouvir passos nos jogos e falar com os amigos. Conforto importa em sessões longas.",
-      "kabum": ["headset gamer"], "menu": "Periféricos/Headsets? Gamer|Periféricos/Headsets", "zoom": ["headset gamer"], "zoomCat": ["Headset", "Fone de Ouvido"],
-      "re": "^headset|^fone (de ouvido )?(gamer|headset)" },
-    { "id": "mousepad", "nome": "Mousepad", "grupo": "perifericos", "icone": "ti-rectangle",
+      "kabum": [
+        "headset gamer",
+        "headset sem fio"
+      ],
+      "menu": "Periféricos/Headsets? Gamer|Periféricos/Headsets",
+      "zoom": [
+        "headset gamer",
+        "headset sem fio"
+      ],
+      "zoomCat": [
+        "Headset",
+        "Fone de Ouvido"
+      ],
+      "re": "^headset|^fone (de ouvido )?(gamer|headset)"
+    },
+    {
+      "id": "mousepad",
+      "nome": "Mousepad",
+      "grupo": "perifericos",
+      "icone": "ti-rectangle",
       "serve": "Superfície do mouse. Os grandes (speed/control) ajudam na mira e protegem a mesa.",
-      "kabum": ["mousepad"], "menu": "Periféricos/Mouse Pad", "zoom": [], "zoomCat": ["Mouse Pad"],
-      "re": "^mouse ?pad" },
-    { "id": "webcam", "nome": "Webcam e microfone", "grupo": "perifericos", "icone": "ti-camera",
+      "kabum": [
+        "mousepad"
+      ],
+      "menu": "Periféricos/Mouse Pad",
+      "zoom": [
+
+      ],
+      "zoomCat": [
+        "Mouse Pad"
+      ],
+      "re": "^mouse ?pad"
+    },
+    {
+      "id": "webcam",
+      "nome": "Webcam e microfone",
+      "grupo": "perifericos",
+      "icone": "ti-camera",
       "serve": "Para chamadas de vídeo, aulas e stream. Microfone dedicado melhora muito a voz.",
-      "kabum": ["webcam", "microfone streamer"], "menu": "Webcam e Videoconferência/Webcam|Streamer/Microfone|Áudio/Microfone", "zoom": ["webcam", "microfone usb"], "zoomCat": ["WebCam", "Microfone"],
-      "re": "^webcam|^microfone" },
-    { "id": "controle", "nome": "Controle", "grupo": "perifericos", "icone": "ti-device-gamepad",
+      "kabum": [
+        "webcam",
+        "microfone streamer"
+      ],
+      "menu": "Webcam e Videoconferência/Webcam|Streamer/Microfone|Áudio/Microfone",
+      "zoom": [
+        "webcam",
+        "microfone usb"
+      ],
+      "zoomCat": [
+        "WebCam",
+        "Microfone"
+      ],
+      "re": "^webcam|^microfone"
+    },
+    {
+      "id": "controle",
+      "nome": "Controle",
+      "grupo": "perifericos",
+      "icone": "ti-device-gamepad",
       "serve": "Controle para PC e consoles. DualSense (PS5) e controle Xbox funcionam no PC também.",
-      "kabum": ["controle"], "menu": "Games/(Acessórios Gamer/Joystick|Playstation/Controles|Xbox/Controles|Nintendo/Controles)", "zoom": ["controle dualsense", "controle xbox"], "zoomCat": ["Controle para Video Game", "Controle"],
-      "re": "^controle|^joystick|dualsense" },
-    { "id": "monitor", "nome": "Monitor", "grupo": "monitores", "icone": "ti-device-tv",
+      "kabum": [
+        "controle"
+      ],
+      "menu": "Games/(Acessórios Gamer/Joystick|Playstation/Controles|Xbox/Controles|Nintendo/Controles)",
+      "zoom": [
+        "controle dualsense",
+        "controle xbox"
+      ],
+      "zoomCat": [
+        "Controle para Video Game",
+        "Controle"
+      ],
+      "re": "^controle|^joystick|^dualsense"
+    },
+    {
+      "id": "monitor",
+      "nome": "Monitor",
+      "grupo": "monitores",
+      "icone": "ti-device-tv",
       "serve": "A tela. Para jogos, olhe a taxa de atualização (Hz: 144 ou mais é fluido) e a resolução (Full HD, 2K/QHD, 4K).",
-      "kabum": ["monitor gamer", "monitor"], "menu": "Computadores/Monitores", "zoom": ["monitor gamer", "monitor"], "zoomCat": ["Monitor"],
-      "re": "^monitor\\b" },
-    { "id": "pc", "nome": "PC pronto e kits", "grupo": "prontos", "icone": "ti-device-desktop-analytics",
+      "kabum": [
+        "monitor gamer",
+        "monitor",
+        "monitor 27",
+        "monitor 2k",
+        "monitor 4k"
+      ],
+      "menu": "Computadores/Monitores",
+      "zoom": [
+        "monitor gamer",
+        "monitor",
+        "monitor 27",
+        "monitor 2k"
+      ],
+      "zoomCat": [
+        "Monitor"
+      ],
+      "re": "^monitor\\b"
+    },
+    {
+      "id": "pc",
+      "nome": "PC pronto e kits",
+      "grupo": "prontos",
+      "icone": "ti-device-desktop-analytics",
       "serve": "Computador já montado ou kit de upgrade (processador + placa-mãe + memória). Prático, mas compare com montar peça por peça.",
-      "kabum": ["pc gamer", "kit upgrade"], "menu": "Computadores/PC|Kit Hardware/Kit Upgrade", "zoom": ["pc gamer"], "zoomCat": ["Computador", "PC"],
-      "re": "^(pc gamer|computador|pichau kit|kit upgrade|.*kit upgrade)" },
-    { "id": "notebook", "nome": "Notebook", "grupo": "prontos", "icone": "ti-device-laptop",
+      "kabum": [
+        "pc gamer",
+        "kit upgrade"
+      ],
+      "menu": "Computadores/PC|Kit Hardware/Kit Upgrade",
+      "zoom": [
+        "pc gamer"
+      ],
+      "zoomCat": [
+        "Computador",
+        "PC"
+      ],
+      "re": "^(pc gamer|computador|pichau kit|kit upgrade|.*kit upgrade)"
+    },
+    {
+      "id": "notebook",
+      "nome": "Notebook",
+      "grupo": "prontos",
+      "icone": "ti-device-laptop",
       "serve": "Computador portátil. Para jogos, procure um com placa de vídeo dedicada (RTX).",
-      "kabum": ["notebook gamer", "notebook"], "menu": "Computadores/Notebooks/Notebook", "zoom": ["notebook gamer", "notebook"], "zoomCat": ["Notebook"],
-      "re": "^notebook" },
-    { "id": "console", "nome": "Console", "grupo": "games", "icone": "ti-device-gamepad-2",
+      "kabum": [
+        "notebook gamer",
+        "notebook",
+        "notebook rtx",
+        "notebook i5",
+        "notebook ryzen"
+      ],
+      "menu": "Computadores/Notebooks/Notebook",
+      "zoom": [
+        "notebook gamer",
+        "notebook",
+        "notebook rtx"
+      ],
+      "zoomCat": [
+        "Notebook"
+      ],
+      "re": "^notebook"
+    },
+    {
+      "id": "console",
+      "nome": "Console",
+      "grupo": "games",
+      "icone": "ti-device-gamepad-2",
       "serve": "PlayStation, Xbox e Nintendo.",
-      "kabum": ["console playstation 5", "console xbox", "nintendo switch"], "menu": "Consoles (Playstation|Xbox|Nintendo)", "zoom": ["console playstation 5", "xbox series"], "zoomCat": ["Console", "Video Game"],
-      "re": "^console|^(sony )?playstation 5( slim| pro| digital)?\\b(?!.*jogo)|^xbox series|^nintendo switch" },
-    { "id": "jogo-ps5", "nome": "Jogos PS5", "grupo": "games", "icone": "ti-disc",
+      "kabum": [
+        "console playstation 5",
+        "console xbox",
+        "nintendo switch"
+      ],
+      "menu": "Consoles (Playstation|Xbox|Nintendo)",
+      "zoom": [
+        "console playstation 5",
+        "xbox series"
+      ],
+      "zoomCat": [
+        "Console",
+        "Video Game"
+      ],
+      "re": "^console|^(sony )?playstation 5( slim| pro| digital)?\\b(?!.*jogo)|^xbox series|^nintendo switch"
+    },
+    {
+      "id": "jogo-ps5",
+      "nome": "Jogos PS5",
+      "grupo": "games",
+      "icone": "ti-disc",
       "serve": "Jogos de PS5 em mídia física (disco): dá para revender ou emprestar depois.",
-      "kabum": ["jogo ps5"], "menu": "Jogos Playstation/Playstation 5", "zoom": ["jogos ps5"], "zoomCat": ["Jogos PS5"],
-      "re": "^jogo\\b.*\\b(ps5|playstation 5)\\b" },
-    { "id": "jogo-ps4", "nome": "Jogos PS4", "grupo": "games", "icone": "ti-disc",
+      "kabum": [
+        "jogo ps5"
+      ],
+      "menu": "Jogos Playstation/Playstation 5",
+      "zoom": [
+        "jogos ps5"
+      ],
+      "zoomCat": [
+        "Jogos PS5"
+      ],
+      "re": "^jogo\\b.*\\b(ps5|playstation 5)\\b"
+    },
+    {
+      "id": "jogo-ps4",
+      "nome": "Jogos PS4",
+      "grupo": "games",
+      "icone": "ti-disc",
       "serve": "Jogos de PS4 em mídia física. Quase todos também rodam no PS5.",
-      "kabum": ["jogo ps4"], "menu": "Jogos Playstation/Playstation 4", "zoom": ["jogos ps4"], "zoomCat": ["Jogos PS4"],
-      "re": "^jogo\\b.*\\b(ps4|playstation 4)\\b" }
+      "kabum": [
+        "jogo ps4"
+      ],
+      "menu": "Jogos Playstation/Playstation 4",
+      "zoom": [
+        "jogos ps4"
+      ],
+      "zoomCat": [
+        "Jogos PS4"
+      ],
+      "re": "^jogo\\b.*\\b(ps4|playstation 4)\\b"
+    },
+    {
+      "id": "cadeira",
+      "nome": "Cadeira gamer",
+      "grupo": "perifericos",
+      "icone": "ti-armchair",
+      "serve": "Conforto para longas horas no PC. Veja o peso máximo suportado e se o encosto reclina.",
+      "kabum": [
+        "cadeira gamer"
+      ],
+      "menu": "Cadeiras Gamer",
+      "zoom": [
+        "cadeira gamer"
+      ],
+      "zoomCat": [
+        "Cadeira Gamer"
+      ],
+      "re": "^cadeira"
+    },
+    {
+      "id": "som",
+      "nome": "Caixa de som",
+      "grupo": "perifericos",
+      "icone": "ti-speakerphone",
+      "serve": "Som para o PC sem precisar de fone. Para filmes e música, soundbar ou caixas 2.1 com subwoofer soam melhor.",
+      "kabum": [
+        "caixa de som pc",
+        "soundbar"
+      ],
+      "menu": "Caixa de Som|Soundbar",
+      "zoom": [
+        "caixa de som pc"
+      ],
+      "zoomCat": [
+        "Caixa de Som para PC"
+      ],
+      "re": "^(caixa de som|soundbar)"
+    },
+    {
+      "id": "rede",
+      "nome": "Roteador e Wi-Fi",
+      "grupo": "perifericos",
+      "icone": "ti-wifi",
+      "serve": "Internet mais estável e rápida pelo Wi-Fi. Para jogos online, Wi-Fi 6 ou cabo ajudam a diminuir o ping.",
+      "kabum": [
+        "roteador wifi",
+        "roteador mesh"
+      ],
+      "menu": "Dispositivo de Rede/(Roteador|Repetidor)",
+      "zoom": [
+        "roteador wifi 6"
+      ],
+      "zoomCat": [
+        "Modem e Roteador",
+        "Roteador"
+      ],
+      "re": "^(roteador|repetidor|sistema mesh)"
+    },
+    {
+      "id": "jogo-switch",
+      "nome": "Jogos Switch",
+      "grupo": "games",
+      "icone": "ti-disc",
+      "serve": "Jogos de Nintendo Switch em mídia física (cartucho).",
+      "kabum": [
+        "jogo nintendo switch"
+      ],
+      "menu": "Jogos Nintendo",
+      "zoom": [
+        "jogo nintendo switch"
+      ],
+      "zoomCat": [
+        "Jogos Nintendo Switch"
+      ],
+      "re": "^jogo\\b.*\\b(nintendo )?switch\\b"
+    },
+    {
+      "id": "jogo-xbox",
+      "nome": "Jogos Xbox",
+      "grupo": "games",
+      "icone": "ti-disc",
+      "serve": "Jogos de Xbox Series e Xbox One em mídia física.",
+      "kabum": [
+        "jogo xbox series"
+      ],
+      "menu": "Jogos Xbox",
+      "zoom": [
+        "jogos xbox"
+      ],
+      "zoomCat": [
+        "Jogos Xbox One",
+        "Jogos Xbox Series"
+      ],
+      "re": "^jogo\\b.*\\bxbox\\b"
+    }
   ],
   "excluir": "suporte|\\bcabo\\b|adaptador|\\bcapa\\b|pel[ií]cula|limpeza|\\bbase (para|refrigerada)|mochila|\\bbolsa\\b|case para|extensor|riser|backplate|pasta t[ée]rmica|recondicionad|\\busad[oa]\\b|seminov|open ?box|vitrine|pe[çc]a de reposi|refil|skin\\b|adesivo|grip\\b|cartão (de )?presente|gift ?card|assinatura|c[óo]digo digital|\\bkey\\b|voucher",
-  "lojasConfiaveis": ["KaBuM!", "Pichau", "Terabyte", "Amazon", "Magazine Luiza", "Mercado Livre", "Fast Shop", "Casas Bahia", "AliExpress", "Americanas", "Ponto", "Extra"],
+  "lojasConfiaveis": [
+    "KaBuM!",
+    "Pichau",
+    "Terabyte",
+    "Amazon",
+    "Magazine Luiza",
+    "Mercado Livre",
+    "Fast Shop",
+    "Casas Bahia",
+    "AliExpress",
+    "Americanas",
+    "Ponto",
+    "Extra"
+  ],
   "promobitLojas": [
-    { "slug": "pichau", "loja": "Pichau" },
-    { "slug": "terabyteshop", "loja": "Terabyte" },
-    { "slug": "mercado-livre", "loja": "Mercado Livre" },
-    { "slug": "aliexpress", "loja": "AliExpress", "importado": true },
-    { "slug": "casas-bahia", "loja": "Casas Bahia" },
-    { "slug": "kabum", "loja": "KaBuM!" },
-    { "slug": "amazon", "loja": "Amazon" },
-    { "slug": "magazine-luiza", "loja": "Magazine Luiza" },
-    { "slug": "fast-shop", "loja": "Fast Shop" }
+    {
+      "slug": "pichau",
+      "loja": "Pichau"
+    },
+    {
+      "slug": "terabyteshop",
+      "loja": "Terabyte"
+    },
+    {
+      "slug": "mercado-livre",
+      "loja": "Mercado Livre"
+    },
+    {
+      "slug": "aliexpress",
+      "loja": "AliExpress",
+      "importado": true
+    },
+    {
+      "slug": "casas-bahia",
+      "loja": "Casas Bahia"
+    },
+    {
+      "slug": "kabum",
+      "loja": "KaBuM!"
+    },
+    {
+      "slug": "amazon",
+      "loja": "Amazon"
+    },
+    {
+      "slug": "magazine-luiza",
+      "loja": "Magazine Luiza"
+    },
+    {
+      "slug": "fast-shop",
+      "loja": "Fast Shop"
+    }
   ]
 }

@@ -95,6 +95,32 @@ nav button.on{color:var(--verde)}
 .seg button{flex:1;padding:6px;border-radius:7px;font-size:14px}
 .seg button.on{background:var(--card);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 input.campo{width:100%;border:0;background:var(--card);border-radius:10px;padding:12px;font:inherit;color:var(--txt);outline:none}
+/* montar PC */
+.passo{font-size:13px;color:var(--sec);margin-top:4px}
+.progresso{height:4px;background:var(--card2);border-radius:2px;margin:10px 0 18px;overflow:hidden}
+.progresso div{height:100%;background:var(--verde)}
+.pergunta{font-size:24px;font-weight:700;line-height:1.25;margin:0 0 14px}
+.opcoes{display:flex;flex-direction:column;gap:10px}
+.opcao{background:var(--card);border-radius:14px;padding:14px 16px;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px;border:2px solid transparent}
+.opcao b{display:block;font-size:16px}
+.opcao small{display:block;color:var(--sec);font-size:13px;margin-top:2px;line-height:1.35}
+.opcao.on{border-color:var(--verde)}
+.opcao .marca{width:24px;height:24px;border-radius:12px;border:2px solid var(--sep);flex:none;display:flex;align-items:center;justify-content:center;color:var(--naVerde)}
+.opcao.on .marca{background:var(--verde);border-color:var(--verde)}
+.valor{font-size:34px;font-weight:700;text-align:center;margin:8px 0}
+input[type=range]{width:100%;accent-color:var(--verde)}
+.peca{background:var(--card);border-radius:14px;padding:10px;display:flex;gap:10px;align-items:flex-start;margin-top:8px}
+.peca .foto{width:64px;height:64px;flex:none;border-radius:10px}
+.peca .info{flex:1;min-width:0}
+.peca .rotulo{font-size:12px;color:var(--verde);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.peca .nm{font-size:14px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.peca .serve{font-size:12px;color:var(--sec);margin-top:3px;line-height:1.35}
+.peca .pr{font-weight:600;font-size:15px;white-space:nowrap;text-align:right}
+.peca .troca{font-size:13px;color:var(--verde);font-weight:600;margin-top:6px}
+.compat{display:flex;gap:8px;align-items:flex-start;padding:7px 0;font-size:14px}
+.compat .ok{color:var(--verde);flex:none}
+.compat .nao{color:var(--vermelho);flex:none}
+.total{background:var(--card);border-radius:16px;padding:16px;margin-top:6px}
 .esqueleto{background:var(--card);border-radius:16px;aspect-ratio:3/4;opacity:.6}
 </style>
 </head>
@@ -102,6 +128,7 @@ input.campo{width:100%;border:0;background:var(--card);border-radius:10px;paddin
 <main id="app"></main>
 <nav id="abas"></nav>
 <div class="toast" id="toast"></div>
+<script src="montar.js?v=1795285049"></script>
 <script>
 // Ícones (desenhos simples, estilo iOS)
 const I = {
@@ -115,6 +142,9 @@ const I = {
   lupa: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
   voltar: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
   compartilhar: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>',
+  chip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>',
+  check: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+  alerta: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg>',
   seta: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>',
 };
 
@@ -168,7 +198,7 @@ let ABA = 'ofertas';
 const PILHA = [];
 function abas() {
   const b = (id, ic, nome) => `<button class="${ABA === id ? 'on' : ''}" onclick="irAba('${id}')">${ic}<span>${nome}</span></button>`;
-  document.getElementById('abas').innerHTML = b('ofertas', I.fogo, 'Ofertas') + b('categorias', I.grade, 'Categorias') + b('salvos', I.coracao, 'Salvos') + b('perfil', I.pessoa, 'Perfil');
+  document.getElementById('abas').innerHTML = b('ofertas', I.fogo, 'Ofertas') + b('categorias', I.grade, 'Categorias') + b('montar', I.chip, 'Montar PC') + b('salvos', I.coracao, 'Salvos') + b('perfil', I.pessoa, 'Perfil');
 }
 function irAba(id) {
   ABA = id; PILHA.length = 0;
@@ -190,7 +220,7 @@ function rota() {
   const h = decodeURIComponent(location.hash.slice(1));
   if (h.startsWith('produto=')) telaProduto(h.slice(8), volta);
   else {
-    if (['categorias', 'salvos', 'perfil'].includes(h)) ABA = h;
+    if (['categorias', 'montar', 'salvos', 'perfil'].includes(h)) ABA = h;
     else if (!h) ABA = 'ofertas';
     desenhar();
   }
@@ -202,6 +232,7 @@ function desenhar() {
   abas();
   if (ABA === 'categorias') return telaCategorias();
   if (ABA === 'salvos') return telaSalvos();
+  if (ABA === 'montar') return telaMontar();
   if (ABA === 'perfil') return telaPerfil();
   telaOfertas();
 }
@@ -219,6 +250,10 @@ function lista() {
   const vistos = new Set();
   l = l.filter(o => { if (!o.grupo) return true; if (vistos.has(o.grupo)) return false; vistos.add(o.grupo); return true; })
        .map(o => o.grupo ? GRUPOS.get(o.grupo)[0] : o);
+  // garantia final: mesmo nome nunca aparece duas vezes, fica o mais barato
+  const porNome = new Map();
+  for (const o of l) { const k = norm(o.t).replace(/[^a-z0-9]+/g, ' ').trim(); if (!porNome.has(k) || o.pix < porNome.get(k).pix) porNome.set(k, o); }
+  l = [...porNome.values()];
   const ord = {
     nota: (a, b) => b.nota - a.nota,
     menor: (a, b) => a.pix - b.pix,
@@ -373,7 +408,7 @@ function telaCategorias() {
     ${CFG.grupos.map(g => `<h2>${g.nome}</h2><div class="grupo">${CFG.categorias.filter(c => c.grupo === g.id).map(c => `
       <button class="item" style="width:100%;text-align:left" onclick="S.grupo='${g.id}';S.cat='${c.id}';S.busca='';limite=40;salvar();irAba('ofertas')">
         <span>${c.nome}<small>${conta[c.id] || 0} ofertas</small></span><span class="dir" style="color:var(--sec)">${I.seta}</span></button>`).join('')}</div>`).join('')}
-    <div class="sub" style="margin-top:16px">Em breve: "Montar PC" com questionário de orçamento e uso.</div>
+    <button class="btn" style="width:100%;margin-top:20px" onclick="irAba('montar')">Montar um PC com as ofertas de hoje</button>
   </div>`;
 }
 

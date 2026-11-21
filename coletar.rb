@@ -116,17 +116,30 @@ def desempenho(cat, titulo)
 end
 
 # códigos de fabricante (ex.: GV-N5060EAGLEMAX, 912-V537-037, CT1000P3SSD8) identificam o mesmo produto em lojas diferentes
+RE_CODIGO = /\b[A-Z0-9]+(?:[-\/][A-Z0-9]+)+\b|\b[A-Z0-9]{7,}\b/
+def codigo?(x)
+  x = x.gsub(/[-\/]/, '')
+  # pedaços de especificação (8GB-GDDR7, 128-BIT, PCIE-4.0...) aparecem em muitos produtos: não são código de fabricante
+  x.length >= 7 && x =~ /\d/ && x =~ /[A-Z]/ &&
+    x !~ /\d+(GB|TB|MHZ|HZ|MM|W)(?![A-Z0-9])|\d(GB|TB)|GDDR|DDR\d|BITS?|PCIE|HDMI|USB|ARGB|RGB|NVME|SATA|WIFI|LGA|ATX|GEN\d|ANOS?|MESES|DPI|MAH|\d+(CM|ML|KG|MS)\b/
+end
 def codigos(titulo)
-  titulo.upcase.scan(/\b[A-Z0-9]+(?:[-\/][A-Z0-9]+)+\b|\b[A-Z0-9]{8,}\b/)
-        .map { |x| x.gsub(/[-\/]/, '') }
-        .select { |x| x.length >= 7 && x =~ /\d/ && x =~ /[A-Z]/ && x !~ /^\d+(GB|TB|MHZ|HZ|W|MM)$/ && x !~ /^(DDR\d|PCIE|GDDR|USB|HDMI|RGB|ARGB)/ }
-        .uniq
+  titulo.upcase.scan(RE_CODIGO).select { |x| codigo?(x) }.map { |x| x.gsub(/[-\/]/, '') }.uniq
 end
 
+# palavras que não ajudam a dizer se dois anúncios são o mesmo produto (inclui cores: preto e branco do mesmo modelo = mesmo item)
 PARADAS = %w[de da do para com e o a em gamer placa video processador memoria monitor notebook mouse teclado headset fonte gabinete
-             jogo midia fisica sem fio preto preta branco branca rgb argb new novo original oficial pc ps5 ps4 playstation].freeze
+             jogo midia fisica sem fio mae rgb argb new novo original oficial pc ps5 ps4 playstation edicao edition versao
+             preto preta branco branca cinza rosa azul vermelho vermelha verde roxo roxa lilas amarelo amarela black white pink grey gray].freeze
+# palavras do nome, sem os códigos de fabricante (que mudam de cor para cor e nem toda loja mostra)
 def fichas(titulo)
-  sem_acento(titulo).scan(/[a-z0-9]+/).reject { |w| w.length < 2 || PARADAS.include?(w) }.uniq
+  limpo = titulo.upcase.gsub(RE_CODIGO) { |m| codigo?(m) ? ' ' : m }
+  sem_acento(limpo).scan(/[a-z0-9]+/).reject { |w| w.length < 2 || PARADAS.include?(w) }.uniq
+end
+DIFERENCIAIS = %w[ti super xt xtx gre pro max plus mini lite slim digital ultra air se deluxe gold premium complete definitive
+                  oc x3d hero elite v2 v3 mk2 ii iii].freeze
+def nome_igual(titulo)
+  sem_acento(titulo).gsub(/[^a-z0-9]+/, ' ').strip
 end
 
 ofertas = []
@@ -135,13 +148,19 @@ def item(h)
   h
 end
 
+if ENV['REUSAR'] == '1'
+  # teste: reaproveita a última coleta (só refaz grupos e notas)
+  ofertas = JSON.parse(File.read(File.join(DATA, 'ofertas.json')))['ofertas']
+  ofertas.each { |o| %w[grupo maisBarato perf chip nota np ref min motivos acima].each { |k| o.delete(k) } }
+  ofertas.each { |o| LOG[o['fonte'] == 'kabum' ? 'KaBuM!' : "#{o['fonte'] == 'zoom' ? 'Zoom' : 'Promobit'} (#{o['loja']})"] += 1 }
+else
 # ---------- 1. KaBuM! ----------
 puts 'KaBuM!...'
 vistos = {}
 CATS.each do |c|
   menu = Regexp.new(c['menu'])
   c['kabum'].each do |q|
-    (RAPIDO ? 1 : 2).times do |pg|
+    (RAPIDO ? 1 : 3).times do |pg|
       url = "https://servicespub.prod.api.aws.grupokabum.com.br/catalog/v2/products?page_size=100&page_number=#{pg + 1}&sort=most_searched&query=#{q.gsub(' ', '%20')}"
       j = (JSON.parse(baixar(url) || '{}') rescue {})
       (j['data'] || []).each do |d|
@@ -174,7 +193,7 @@ confiaveis = CFG['lojasConfiaveis']
 vistos = {}
 CATS.each do |c|
   c['zoom'].each do |q|
-    (RAPIDO ? 1 : 3).times do |pg|
+    (RAPIDO ? 1 : 4).times do |pg|
       j = next_data(baixar("https://www.zoom.com.br/search?q=#{q.gsub(' ', '%20')}&page=#{pg + 1}"))
       break unless j
       objetos(j) { |o| o['price'] && o['name'] && o['type'] && o['url'] }.each do |o|
@@ -222,6 +241,8 @@ CFG['promobitLojas'].each do |l|
   sleep 0.8
 end
 
+end
+
 abort 'Nenhuma oferta coletada — mantendo os dados anteriores.' if ofertas.size < 50
 
 # ---------- histórico de preços (menor preço de cada dia, 120 dias) ----------
@@ -240,33 +261,67 @@ hist.each_value { |h| h.reject! { |d, _| d < corte } }
 hist.reject! { |_, h| h.empty? }
 
 # ---------- mesmo produto em lojas diferentes ----------
-pai = {}
-achar = ->(x) { pai[x] == x ? x : (pai[x] = achar.(pai[x])) }
-unir = ->(a, b) { pai[achar.(a)] = achar.(b) }
-ofertas.each { |o| pai[o['id']] = o['id'] }
-ofertas.group_by { |o| o['cat'] }.each_value do |lista|
-  por_codigo = {}
-  lista.each do |o|
-    o['_f'] = fichas(o['t'])
-    o['_n'] = o['_f'].select { |w| w =~ /\d/ }
-    codigos(o['t']).each { |cd| por_codigo[cd] ? unir.(o['id'], por_codigo[cd]) : por_codigo[cd] = o['id'] }
-  end
-  # nomes muito parecidos (mesmas palavras e mesmos números) = mesmo produto
-  lista.each_with_index do |a, i|
-    next if a['_n'].empty?
-    lista[(i + 1)..-1].each do |b|
-      next if a['loja'] == b['loja'] || b['_n'].empty?
-      menor, maior = [a['_n'], b['_n']].sort_by(&:size)
-      next unless (menor - maior).empty?
-      inter = (a['_f'] & b['_f']).size
-      uniao = (a['_f'] | b['_f']).size
-      unir.(a['id'], b['id']) if uniao > 0 && inter.to_f / uniao >= 0.6
-    end
-  end
+def mediana(v)
+  s = v.sort
+  s.empty? ? nil : (s[(s.size - 1) / 2] + s[s.size / 2]) / 2.0
 end
-grupos = ofertas.group_by { |o| achar.(o['id']) }
-grupos.each_value do |g|
+# o mesmo nome em categorias diferentes (cada fonte classifica de um jeito): vale a categoria da KaBuM!
+cat_do_nome = {}
+ofertas.sort_by { |o| o['fonte'] == 'kabum' ? 0 : 1 }.each { |o| cat_do_nome[nome_igual(o['t'])] ||= o['cat'] }
+ofertas.each { |o| o['cat'] = cat_do_nome[nome_igual(o['t'])] }
+ofertas.each do |o|
+  perf, chip = desempenho(o['cat'], o['t'])
+  o['perf'] = perf
+  o['chip'] = chip
+  o['_f'] = fichas(o['t'])
+  o['_n'] = o['_f'].select { |w| w =~ /\d/ }
+end
+# dois anúncios são o mesmo produto se: mesma marca (1ª palavra), mesmos números (capacidade, modelo...),
+# nenhuma palavra que muda o modelo (Ti, Pro, Deluxe...) e nomes bem parecidos (mais ainda se forem da mesma loja)
+def mesmos_numeros?(a, b)
+  menor, maior = [a["_n"], b["_n"]].sort_by(&:size)
+  (menor - maior).empty?
+end
+def parecido?(a, b)
+  return false if a['_n'].empty? || b['_n'].empty? || a['_f'][0] != b['_f'][0]
+  menor, maior = [a['_n'], b['_n']].sort_by(&:size)
+  return false unless (menor - maior).empty?
+  return false unless ((a['_f'] - b['_f']) | (b['_f'] - a['_f'])).none? { |w| DIFERENCIAIS.include?(w) }
+  uniao = (a['_f'] | b['_f']).size
+  uniao > 0 && (a['_f'] & b['_f']).size.to_f / uniao >= (a['loja'] == b['loja'] ? 0.75 : 0.6)
+end
+# cada grupo tem um anúncio de referência; só entra quem combina com ELE (evita efeito cascata A~B~C)
+grupos = []
+# placas de vídeo e processadores: só junta anúncios do mesmo chip (RTX 5060 nunca com 5060 Ti)
+ofertas.group_by { |o| [o['cat'], %w[gpu cpu].include?(o['cat']) ? o['chip'].to_s : ''] }.each_value do |lista|
+  locais = []
+  por_codigo = {}
+  por_nome = {}
+  lista.sort_by { |o| -o['t'].size }.each do |o|
+    nome = nome_igual(o['t'])
+    cods = codigos(o['t'])
+    g = por_nome[nome] || cods.map { |c| por_codigo[c] }.compact.find { |x| x[0]["_f"][0] == o["_f"][0] && mesmos_numeros?(x[0], o) } || locais.find { |x| parecido?(x[0], o) }
+    unless g
+      g = []
+      locais << g
+    end
+    g << o
+    por_nome[nome] ||= g
+    cods.each { |c| por_codigo[c] ||= g }
+  end
+  grupos.concat(locais)
+end
+grupos.each do |g|
   g.sort_by! { |o| o['pix'] }
+  # trava de segurança: preço muito diferente do resto do grupo = provavelmente outro produto (combo, kit): sai do grupo
+  if g.size > 1 && g.last['pix'] > g.first['pix'] * 2
+    med = mediana(g.map { |o| o['pix'] })
+    fora = g.select { |o| o['pix'] > med * 1.6 || o['pix'] < med / 1.6 }
+    fora.each { |o| o['grupo'] = o['maisBarato'] = nil }
+    g -= fora
+    g.each { |o| o['grupo'] = o['maisBarato'] = nil } if g.size < 2
+    next if g.size < 2
+  end
   lojas = g.map { |o| o['loja'] }.uniq
   g.each_with_index do |o, i|
     o['grupo'] = g.size > 1 ? g.first['id'] : nil
@@ -275,19 +330,10 @@ grupos.each_value do |g|
 end
 
 # ---------- nota: metade histórico de preço, metade custo-benefício ----------
-def mediana(v)
-  s = v.sort
-  s.empty? ? nil : (s[(s.size - 1) / 2] + s[s.size / 2]) / 2.0
-end
 def limitar(x, a, b)
   [[x, a].max, b].min
 end
 
-ofertas.each do |o|
-  perf, chip = desempenho(o['cat'], o['t'])
-  o['perf'] = perf
-  o['chip'] = chip
-end
 # custo-benefício de placas e processadores: desempenho por real, comparado com a categoria
 %w[gpu cpu].each do |cat|
   l = ofertas.select { |o| o['cat'] == cat && o['perf'] }
